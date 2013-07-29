@@ -2,7 +2,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int min3(const int a, const int b, const int c)
+static int32_t min3(const int32_t a, const int32_t b, const int32_t c)
 {
     if (a < b && a < c) {
         return a;
@@ -11,6 +11,11 @@ static int min3(const int a, const int b, const int c)
     } else {
         return b;
     }
+}
+
+static int32_t min2(const int32_t a, const int32_t b)
+{
+    return a < b ? a : b;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
