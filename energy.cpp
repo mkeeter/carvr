@@ -2,24 +2,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static int32_t min3(const int32_t a, const int32_t b, const int32_t c)
-{
-    if (a < b && a < c) {
-        return a;
-    } else if (c < b && c < a) {
-        return c;
-    } else {
-        return b;
-    }
-}
-
-static int32_t min2(const int32_t a, const int32_t b)
-{
-    return a < b ? a : b;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // Calculates the energy of the image, normalized to 8-bit values.
 cv::Mat GetEnergy(const cv::Mat& orig)
 {
@@ -36,7 +18,9 @@ cv::Mat GetEnergy(const cv::Mat& orig)
     cv::Sobel(gray, v, CV_16S, 0, 1);
 
     // Return the sum of the two
-    return cv::abs(h) + cv::abs(v);
+    cv::Mat energy = cv::abs(h) + cv::abs(v);
+    energy.convertTo(energy, CV_32S);
+    return energy;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -44,21 +28,26 @@ cv::Mat GetEnergy(const cv::Mat& orig)
 // Calculates cumulative energy going down the image.
 cv::Mat GetVerticalEnergy(const cv::Mat& energy)
 {
-    cv::Mat summed(energy.size(), CV_32S);
+    cv::Mat summed;
+    energy.copyTo(summed);
 
-    // Initialize the bottom row from the energy map
-    energy.row(0).copyTo(summed.row(0));
+    const int c = summed.cols - 1;
+    const cv::Range left(0, c-1);
+    const cv::Range mid(1, c);
+    const cv::Range right(2, c+1);
 
     // Build up energy map for vertical seams.
     for(int j=1; j < energy.rows; ++j) {
-        for(int i=0; i < energy.cols; ++i) {
-            const int a = (i == 0) ?
-                          INT_MAX : summed.at<int32_t>(j-1, i-1);
-            const int b = summed.at<int32_t>(j-1, i);
-            const int c = (i == energy.cols - 1) ?
-                          INT_MAX : summed.at<int32_t>(j-1, i+1);
-            summed.at<int>(j, i) = energy.at<int16_t>(j, i) + min3(a, b, c);
-        }
+        summed.at<int32_t>(j, 0) += std::min(summed.at<int32_t>(j-1, 0),
+                                             summed.at<int32_t>(j-1, 1));
+
+        const cv::Range r(j-1, j);
+        summed(cv::Range(j, j+1), mid) += cv::min(summed(r, mid),
+                                                  cv::min(summed(r, left),
+                                                          summed(r, right)));
+
+        summed.at<int32_t>(j, c) += std::min(summed.at<int32_t>(j-1, c-1),
+                                             summed.at<int32_t>(j-1, c));
     }
 
     return summed;
@@ -69,22 +58,26 @@ cv::Mat GetVerticalEnergy(const cv::Mat& energy)
 // Calculates cumulative energy going across the image.
 cv::Mat GetHorizontalEnergy(const cv::Mat& energy)
 {
-    cv::Mat summed(energy.size(), CV_32S);
+    cv::Mat summed;
+    energy.copyTo(summed);
 
-    // Initialize the left column for horizontal seams
-    energy.col(0).copyTo(summed.col(0));
+    const int r = summed.rows - 1;
+    const cv::Range lower(0, r-1);
+    const cv::Range mid(1, r);
+    const cv::Range upper(2, r+1);
 
     // Build up energy map for horizontal seams.
     for(int i = 1; i < energy.cols; ++i) {
-        for(int j = 0; j < energy.rows; ++j) {
-            const int a = (j == 0) ?
-                          INT_MAX : summed.at<int32_t>(j-1, i-1);
-            const int b = summed.at<int32_t>(j, i-1);
-            const int c = (j == energy.rows - 1) ?
-                          INT_MAX : summed.at<int32_t>(j+1, i-1);
+        summed.at<int32_t>(0, i) += std::min(summed.at<int32_t>(0, i-1),
+                                             summed.at<int32_t>(1, i-1));
 
-            summed.at<int>(j, i) = energy.at<int16_t>(j, i) + min3(a, b, c);
-        }
+        const cv::Range a(i-1, i);
+        summed(cv::Range(i, i+1), mid) += cv::min(summed(a, mid),
+                                                  cv::min(summed(a, lower),
+                                                          summed(a, upper)));
+
+        summed.at<int32_t>(r, i) += std::min(summed.at<int32_t>(r-1, i-1),
+                                             summed.at<int32_t>(r, i-1));
     }
 
     return summed;
