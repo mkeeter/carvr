@@ -1,3 +1,6 @@
+#ifndef FRAME_H
+#define FRAME_H
+
 #include <wx/wx.h>
 
 // Forward declaration of ImagePanel
@@ -12,3 +15,5 @@ public:
 private:
     ImagePanel* const panel;
 };
+
+#endif
