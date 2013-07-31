@@ -2,7 +2,7 @@
 #include "panel.h"
 
 CarvrFrame::CarvrFrame(const wxString& title)
-    : wxFrame(NULL, wxID_ANY, title)
+    : wxFrame(NULL, wxID_ANY, title), panel(new ImagePanel(this))
 {
     wxMenuBar* const menu_bar = new wxMenuBar;
     wxMenu* const file_menu = new wxMenu;
@@ -12,7 +12,6 @@ CarvrFrame::CarvrFrame(const wxString& title)
     SetMenuBar(menu_bar);
 
     wxBoxSizer* const sizer = new wxBoxSizer(wxHORIZONTAL);
-    ImagePanel* const panel = new ImagePanel(this);
     sizer->Add(panel);
 
     this->SetSizer(sizer);
