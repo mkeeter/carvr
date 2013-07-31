@@ -17,3 +17,8 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::LoadImage(wxString filename)
+{
+    /* Nothing to do here */
+}

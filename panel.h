@@ -5,4 +5,5 @@ class ImagePanel : public wxPanel
 public:
     ImagePanel(wxFrame* parent);
     void OnPaint(wxPaintEvent& event);
+    void LoadImage(wxString filename);
 };

@@ -32,7 +32,7 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
             "*.png|*.jpg|*.jpeg|*.bmp");
 
     if (open_dialog->ShowModal() == wxID_OK) {
-        std::cout << open_dialog->GetPath() << std::endl;
+        panel->LoadImage(open_dialog->GetPath());
     }
 
     open_dialog->Destroy();
