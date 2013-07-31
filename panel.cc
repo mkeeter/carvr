@@ -11,7 +11,7 @@ ImagePanel::ImagePanel(wxFrame* parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ImagePanel::OnPaint(wxPaintEvent& event)
+void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     /* Nothing to do here */
 }
