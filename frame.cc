@@ -12,7 +12,7 @@ CarvrFrame::CarvrFrame(const wxString& title)
     SetMenuBar(menu_bar);
 
     wxBoxSizer* const sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(panel);
+    sizer->Add(panel, 1, wxEXPAND);
 
     this->SetSizer(sizer);
 
@@ -32,7 +32,10 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
             "*.png|*.jpg|*.jpeg|*.bmp");
 
     if (open_dialog->ShowModal() == wxID_OK) {
-        panel->LoadImage(open_dialog->GetPath());
+        const std::string filename = open_dialog->GetPath().ToStdString();
+        cv::Mat image = cv::imread(filename);
+        panel->LoadImage(image);
+        SetSize(wxDefaultCoord, wxDefaultCoord, image.cols, image.rows);
     }
 
     open_dialog->Destroy();
