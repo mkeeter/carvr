@@ -2,7 +2,9 @@
 #include "panel.h"
 
 CarvrFrame::CarvrFrame(const wxString& title)
-    : wxFrame(NULL, wxID_ANY, title), panel(new ImagePanel(this))
+    : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize,
+              wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)),
+      panel(new ImagePanel(this))
 {
     wxMenuBar* const menu_bar = new wxMenuBar;
     wxMenu* const file_menu = new wxMenu;
