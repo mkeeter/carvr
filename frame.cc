@@ -11,11 +11,6 @@ CarvrFrame::CarvrFrame(const wxString& title)
     menu_bar->Append(file_menu, _("File"));
     SetMenuBar(menu_bar);
 
-    wxBoxSizer* const sizer = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(panel, 1, wxEXPAND);
-
-    this->SetSizer(sizer);
-
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
 }
