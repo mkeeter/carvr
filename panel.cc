@@ -5,7 +5,6 @@
 ImagePanel::ImagePanel(wxFrame* parent)
     : wxPanel(parent)
 {
-    /* Nothing to do here */
     Bind(wxEVT_PAINT, &ImagePanel::OnPaint, this);
 }
 
