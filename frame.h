@@ -14,6 +14,7 @@ public:
     void OnOpen(wxCommandEvent& event);
     void OnMouseLDown(wxMouseEvent& event);
 private:
+    float scale;
     ImagePanel* const panel;
 };
 

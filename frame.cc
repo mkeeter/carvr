@@ -37,11 +37,14 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
         if (image.cols > image.rows && image.cols > 640) {
             SetSize(wxDefaultCoord, wxDefaultCoord,
                     640, 640*image.rows/image.cols);
+            scale = image.cols / 640.0f;
         } else if (image.rows > 640) {
             SetSize(wxDefaultCoord, wxDefaultCoord,
                     640*image.cols/image.rows, 640);
+            scale = image.rows / 640.0f;
         } else {
             SetSize(wxDefaultCoord, wxDefaultCoord, image.cols, image.rows);
+            scale = 1;
         }
     }
 
