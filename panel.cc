@@ -14,11 +14,10 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     if (!bitmap.IsOk())  return;
 
-    wxPaintDC dc(this);
+    wxGraphicsContext* gc = wxGraphicsContext::Create(this);
     const wxSize size = GetSize();
-    dc.SetUserScale(size.GetWidth()  / float(bitmap.GetWidth()),
-                    size.GetHeight() / float(bitmap.GetHeight()));
-    dc.DrawBitmap(bitmap, 0, 0);
+    gc->DrawBitmap(bitmap, 0, 0, size.GetWidth(), size.GetHeight());
+    delete gc;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
