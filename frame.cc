@@ -30,7 +30,16 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
         const std::string filename = open_dialog->GetPath().ToStdString();
         cv::Mat image = cv::imread(filename);
         panel->LoadImage(image);
-        SetSize(wxDefaultCoord, wxDefaultCoord, image.cols, image.rows);
+
+        if (image.cols > image.rows && image.cols > 640) {
+            SetSize(wxDefaultCoord, wxDefaultCoord,
+                    640, 640*image.rows/image.cols);
+        } else if (image.rows > 640) {
+            SetSize(wxDefaultCoord, wxDefaultCoord,
+                    640*image.cols/image.rows, 640);
+        } else {
+            SetSize(wxDefaultCoord, wxDefaultCoord, image.cols, image.rows);
+        }
     }
 
     open_dialog->Destroy();

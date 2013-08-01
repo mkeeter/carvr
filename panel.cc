@@ -16,6 +16,9 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
     if (!bitmap.IsOk())  return;
 
     wxPaintDC dc(this);
+    const wxSize size = GetSize();
+    dc.SetUserScale(size.GetWidth()  / float(bitmap.GetWidth()),
+                    size.GetHeight() / float(bitmap.GetHeight()));
     dc.DrawBitmap(bitmap, 0, 0);
 }
 
