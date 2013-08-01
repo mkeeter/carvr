@@ -15,6 +15,7 @@ CarvrFrame::CarvrFrame(const wxString& title)
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
+    panel->Bind(wxEVT_LEFT_DOWN, &CarvrFrame::OnMouseLDown, this);
 }
 
 void CarvrFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -45,4 +46,9 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
     }
 
     open_dialog->Destroy();
+}
+
+void CarvrFrame::OnMouseLDown(wxMouseEvent& WXUNUSED(event))
+{
+    std::cout << "left button clicked" << std::endl;
 }
