@@ -3,7 +3,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 ImagePanel::ImagePanel(wxFrame* parent)
-    : wxPanel(parent), drag_mode(NONE)
+    : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(640, 480)),
+      drag_mode(NONE), max_size(GetSize())
 {
     Bind(wxEVT_PAINT, &ImagePanel::OnPaint, this);
     Bind(wxEVT_MOTION, &ImagePanel::OnMouseMove, this);
@@ -53,6 +54,7 @@ void ImagePanel::LoadImage(cv::Mat& cv_image)
         SetSize(wxDefaultCoord, wxDefaultCoord, cv_image.cols, cv_image.rows);
     }
 
+    max_size = GetSize();
     GetParent()->Fit();
     Refresh();
 }
@@ -88,13 +90,20 @@ void ImagePanel::OnMouseMove(wxMouseEvent& event)
     const wxPoint mp = event.GetPosition();
 
     wxSize size = GetSize();
+
     if (drag_mode == HORIZONTAL) {
         int new_width = size.GetWidth() + mp.x - mouse_position.x;
-        if (new_width < DRAG_BORDER)    new_width = DRAG_BORDER;
+        if (new_width < DRAG_BORDER)
+            new_width = DRAG_BORDER;
+        if (new_width > max_size.GetWidth())
+            new_width = max_size.GetWidth();
         size.SetWidth(new_width);
     } else if (drag_mode == VERTICAL) {
         int new_height = size.GetHeight() + mp.y - mouse_position.y;
-        if (new_height < DRAG_BORDER)    new_height = DRAG_BORDER;
+        if (new_height < DRAG_BORDER)
+            new_height = DRAG_BORDER;
+        if (new_height > max_size.GetHeight())
+            new_height = max_size.GetHeight();
         size.SetHeight(new_height);
     }
 

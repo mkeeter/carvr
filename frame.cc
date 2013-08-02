@@ -15,6 +15,8 @@ CarvrFrame::CarvrFrame(const wxString& title)
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
+
+    Fit();
 }
 
 void CarvrFrame::OnQuit(wxCommandEvent& WXUNUSED(event))

@@ -18,6 +18,7 @@ private:
     const static int DRAG_BORDER = 20;
 
     enum {NONE, HORIZONTAL, VERTICAL} drag_mode;
+    wxSize max_size;
     wxPoint mouse_position;
     wxBitmap bitmap;
 };
