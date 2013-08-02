@@ -96,14 +96,6 @@ void ImagePanel::OnMouseMove(wxMouseEvent& event)
         int new_height = size.GetHeight() + mp.y - mouse_position.y;
         if (new_height < DRAG_BORDER)    new_height = DRAG_BORDER;
         size.SetHeight(new_height);
-    } else {
-        if (mp.x >= size.GetWidth() - DRAG_BORDER ||
-            mp.y >= size.GetHeight() - DRAG_BORDER)
-        {
-            SetCursor(wxCURSOR_HAND);
-        } else {
-            SetCursor(wxCURSOR_CROSS);
-        }
     }
 
     if (size != GetSize())
