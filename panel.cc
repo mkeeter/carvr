@@ -3,9 +3,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 ImagePanel::ImagePanel(wxFrame* parent)
-    : wxPanel(parent)
+    : wxPanel(parent), drag_mode(NONE)
 {
     Bind(wxEVT_PAINT, &ImagePanel::OnPaint, this);
+    Bind(wxEVT_MOTION, &ImagePanel::OnMouseMove, this);
+    Bind(wxEVT_LEFT_DOWN, &ImagePanel::OnMouseLDown, this);
+    Bind(wxEVT_LEFT_UP, &ImagePanel::OnMouseLUp, this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,4 +55,62 @@ void ImagePanel::LoadImage(cv::Mat& cv_image)
 
     GetParent()->Fit();
     Refresh();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::OnMouseLDown(wxMouseEvent& event)
+{
+    mouse_position = event.GetPosition();
+    if (mouse_position.x >= GetSize().GetWidth() - DRAG_BORDER) {
+        drag_mode = HORIZONTAL;
+    }
+    else if (mouse_position.y >= GetSize().GetHeight() - DRAG_BORDER) {
+        drag_mode = VERTICAL;
+    } else {
+        drag_mode = NONE;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::OnMouseLUp(wxMouseEvent& event)
+{
+    drag_mode = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::OnMouseMove(wxMouseEvent& event)
+{
+    if (!event.LeftIsDown())    drag_mode = NONE;
+
+    const wxPoint mp = event.GetPosition();
+
+    wxSize size = GetSize();
+    if (drag_mode == HORIZONTAL) {
+        int new_width = size.GetWidth() + mp.x - mouse_position.x;
+        if (new_width < DRAG_BORDER)    new_width = DRAG_BORDER;
+        size.SetWidth(new_width);
+    } else if (drag_mode == VERTICAL) {
+        int new_height = size.GetHeight() + mp.y - mouse_position.y;
+        if (new_height < DRAG_BORDER)    new_height = DRAG_BORDER;
+        size.SetHeight(new_height);
+    } else {
+        if (mp.x >= size.GetWidth() - DRAG_BORDER ||
+            mp.y >= size.GetHeight() - DRAG_BORDER)
+        {
+            SetCursor(wxCURSOR_HAND);
+        } else {
+            SetCursor(wxCURSOR_CROSS);
+        }
+    }
+
+    if (size != GetSize())
+    {
+        SetSize(size);
+        GetParent()->Fit();
+    }
+
+    mouse_position = mp;
 }

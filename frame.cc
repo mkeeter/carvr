@@ -15,10 +15,6 @@ CarvrFrame::CarvrFrame(const wxString& title)
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
-
-    //panel->Bind(wxEVT_MOTION, &CarvrFrame::OnMouseMove,  this);
-    //panel->Bind(wxEVT_LEFT_DOWN, &CarvrFrame::OnMouseLDown,  this);
-    //panel->SetCursor(wxCURSOR_CROSS);
 }
 
 void CarvrFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
@@ -41,58 +37,4 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
     open_dialog->Destroy();
 }
 
-void CarvrFrame::OnMouseLDown(wxMouseEvent& event)
-{
-    /*
-    panel->CaptureMouse();
-    mouse_position = event.GetPosition();
-    const wxSize panel_size = panel->GetSize();
 
-    if (mouse_position.x >= panel_size.GetWidth() - DRAG_BORDER) {
-        drag_mode = HORIZONTAL;
-    }
-    else if (mouse_position.y >= panel_size.GetHeight() - DRAG_BORDER) {
-        drag_mode = VERTICAL;
-    } else {
-        drag_mode = NONE;
-    }
-    */
-}
-
-void CarvrFrame::OnMouseMove(wxMouseEvent& event)
-{
-    /*
-    if (!event.LeftIsDown())    drag_mode = NONE;
-    std::cout << drag_mode << " " << std::flush;
-
-    wxSize size = GetSize();
-    const wxPoint mp = event.GetPosition();
-
-    if (drag_mode == HORIZONTAL) {
-        int new_width = size.GetWidth() + mp.x - mouse_position.x;
-        new_width = std::min(new_width, max_size.GetWidth());
-        new_width = std::max(new_width, DRAG_BORDER);
-        size.SetWidth(new_width);
-    } else if (drag_mode == VERTICAL) {
-        int new_height = size.GetHeight() + mp.y - mouse_position.y;
-        new_height = std::min(new_height, max_size.GetHeight());
-        new_height = std::max(new_height, DRAG_BORDER);
-        size.SetHeight(new_height);
-    }
-
-    if (drag_mode == NONE) {
-        const wxSize panel_size = panel->GetSize();
-        if (mp.x >= panel_size.GetWidth() - DRAG_BORDER ||
-            mp.y >= panel_size.GetHeight() - DRAG_BORDER)
-        {
-            panel->SetCursor(wxCURSOR_HAND);
-        } else {
-            panel->SetCursor(wxCURSOR_CROSS);
-        }
-    } else {
-        SetSize(size);
-    }
-
-    mouse_position = mp;
-    */
-}

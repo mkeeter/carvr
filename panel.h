@@ -11,6 +11,14 @@ public:
     void OnPaint(wxPaintEvent& event);
     void LoadImage(cv::Mat& image);
 private:
+    void OnMouseLDown(wxMouseEvent& event);
+    void OnMouseLUp(wxMouseEvent& event);
+    void OnMouseMove(wxMouseEvent& event);
+
+    const static int DRAG_BORDER = 20;
+
+    enum {NONE, HORIZONTAL, VERTICAL} drag_mode;
+    wxPoint mouse_position;
     wxBitmap bitmap;
 };
 
