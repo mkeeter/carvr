@@ -40,5 +40,16 @@ void ImagePanel::LoadImage(cv::Mat& cv_image)
     wxImage wx_image(cv_image.cols, cv_image.rows, img_data);
     bitmap = wxBitmap(wx_image);
 
+    if (cv_image.cols > cv_image.rows && cv_image.cols > 640) {
+        SetSize(wxDefaultCoord, wxDefaultCoord,
+                640, 640*cv_image.rows/cv_image.cols);
+    } else if (cv_image.rows > 640) {
+        SetSize(wxDefaultCoord, wxDefaultCoord,
+                640*cv_image.cols/cv_image.rows, 640);
+    } else {
+        SetSize(wxDefaultCoord, wxDefaultCoord, cv_image.cols, cv_image.rows);
+    }
+
+    GetParent()->Fit();
     Refresh();
 }
