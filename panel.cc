@@ -10,6 +10,10 @@ ImagePanel::ImagePanel(wxFrame* parent)
     Bind(wxEVT_MOTION, &ImagePanel::OnMouseMove, this);
     Bind(wxEVT_LEFT_DOWN, &ImagePanel::OnMouseLDown, this);
     Bind(wxEVT_LEFT_UP, &ImagePanel::OnMouseLUp, this);
+    Bind(wxEVT_SIZE, &ImagePanel::OnResize, this);
+
+    MakeHorizontalArrow();
+    MakeVerticalArrow();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +24,12 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
     const wxSize size = GetSize();
 
     if (bitmap.IsOk()) {
-        gc->DrawBitmap(bitmap, 0, 0, size.GetWidth(), size.GetHeight());
+        const int w = size.GetWidth();
+        const int h = size.GetHeight();
+        gc->DrawBitmap(bitmap, 0, 0, w, h);
+        gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
+        gc->DrawBitmap(arrow_h, 0, 0, w, h);
+        gc->DrawBitmap(arrow_v, 0, 0, w, h);
     } else {
         gc->SetBrush(wxBrush(wxColour(200, 200, 200)));
         gc->DrawRectangle(0, 0, size.GetWidth(), size.GetHeight());
@@ -35,6 +44,63 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
     delete gc;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::OnResize(wxSizeEvent& WXUNUSED(event))
+{
+    MakeHorizontalArrow();
+    MakeVerticalArrow();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::MakeHorizontalArrow(void)
+{
+    const wxSize size = GetSize();
+    arrow_h = wxBitmap(size, 1);
+
+    wxMemoryDC dc;
+    dc.SelectObject(arrow_h);
+    dc.SetBrush(*wxWHITE_BRUSH);
+    dc.Clear();
+
+    wxPoint points[] = {
+        wxPoint(0, ARROW_SIZE/4),
+        wxPoint(-ARROW_SIZE/2, ARROW_SIZE/4),
+        wxPoint(-ARROW_SIZE/2, ARROW_SIZE/2),
+        wxPoint(-ARROW_SIZE, 0),
+        wxPoint(-ARROW_SIZE/2, -ARROW_SIZE/2),
+        wxPoint(-ARROW_SIZE/2, -ARROW_SIZE/4),
+        wxPoint(0, -ARROW_SIZE/4)};
+    dc.SetBrush(*wxBLACK_BRUSH);
+    dc.SetPen(wxNullPen);
+    dc.DrawPolygon(7, points, size.GetWidth(), size.GetHeight()/2);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::MakeVerticalArrow(void)
+{
+    const wxSize size = GetSize();
+    arrow_v = wxBitmap(size, 1);
+
+    wxMemoryDC dc;
+    dc.SelectObject(arrow_v);
+    dc.SetBrush(*wxWHITE_BRUSH);
+    dc.Clear();
+
+    wxPoint points[] = {
+        wxPoint(ARROW_SIZE/4, 0),
+        wxPoint(ARROW_SIZE/4, -ARROW_SIZE/2),
+        wxPoint(ARROW_SIZE/2, -ARROW_SIZE/2),
+        wxPoint(0, -ARROW_SIZE),
+        wxPoint(-ARROW_SIZE/2, -ARROW_SIZE/2),
+        wxPoint(-ARROW_SIZE/4, -ARROW_SIZE/2),
+        wxPoint(-ARROW_SIZE/4, 0)};
+    dc.SetBrush(*wxBLACK_BRUSH);
+    dc.SetPen(wxNullPen);
+    dc.DrawPolygon(7, points, size.GetWidth()/2, size.GetHeight());
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 void ImagePanel::LoadImage(cv::Mat& cv_image)
