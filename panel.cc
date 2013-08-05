@@ -16,11 +16,22 @@ ImagePanel::ImagePanel(wxFrame* parent)
 
 void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
-    if (!bitmap.IsOk())  return;
-
     wxGraphicsContext* gc = wxGraphicsContext::Create(this);
     const wxSize size = GetSize();
-    gc->DrawBitmap(bitmap, 0, 0, size.GetWidth(), size.GetHeight());
+
+    if (bitmap.IsOk()) {
+        gc->DrawBitmap(bitmap, 0, 0, size.GetWidth(), size.GetHeight());
+    } else {
+        gc->SetBrush(wxBrush(wxColour(200, 200, 200)));
+        gc->DrawRectangle(0, 0, size.GetWidth(), size.GetHeight());
+
+        gc->SetBrush(wxBrush(wxColour(220, 220, 220)));
+        for (int j=0; j <= size.GetHeight() - 20; j += 20) {
+            for (int i=j % 40; i <= size.GetWidth() - 20; i += 40) {
+                gc->DrawRectangle(i, j, 20, 20);
+            }
+        }
+    }
     delete gc;
 }
 
@@ -64,6 +75,9 @@ void ImagePanel::LoadImage(cv::Mat& cv_image)
 void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 {
     mouse_position = event.GetPosition();
+
+    if (!bitmap.IsOk()) return;
+
     if (mouse_position.x >= GetSize().GetWidth() - DRAG_BORDER) {
         drag_mode = HORIZONTAL;
     }
