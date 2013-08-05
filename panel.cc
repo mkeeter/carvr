@@ -152,6 +152,7 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
     } else {
         drag_mode = NONE;
     }
+    Refresh();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,6 +160,8 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 {
     drag_mode = NONE;
+    max_size = GetSize();
+    Refresh();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
