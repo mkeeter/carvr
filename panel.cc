@@ -27,9 +27,23 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
         const int w = size.GetWidth();
         const int h = size.GetHeight();
         gc->DrawBitmap(bitmap, 0, 0, w, h);
-        gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
+
+        if (drag_mode == HORIZONTAL)
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 150)));
+        else if (drag_mode == VERTICAL)
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 0)));
+        else if (drag_mode == NONE)
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
         gc->DrawBitmap(arrow_h, 0, 0, w, h);
+
+        if (drag_mode == VERTICAL)
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 150)));
+        else if (drag_mode == HORIZONTAL)
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 0)));
+        else if (drag_mode == NONE)
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
         gc->DrawBitmap(arrow_v, 0, 0, w, h);
+
     } else {
         gc->SetBrush(wxBrush(wxColour(200, 200, 200)));
         gc->DrawRectangle(0, 0, size.GetWidth(), size.GetHeight());
