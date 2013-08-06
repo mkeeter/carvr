@@ -102,7 +102,7 @@ void ImagePanel::LoadImage(cv::Mat& cv_image)
 
 //////////////////////////////////////////////////////////////////////////////
 
-void ImagePanel::ReloadImage(cv::Mat& cv_image, Axis axis)
+void ImagePanel::ReloadImage(cv::Mat& cv_image)
 {
     assert(cv_image.type() == CV_8UC3);
 
@@ -146,15 +146,21 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
     if (mode == DRAG_HORIZONTAL) {
         mode = RESIZING;
         int new_width = image.rows * size.GetWidth() / size.GetHeight();
-        while (image.cols > new_width)
-        {
+        while (image.cols > new_width) {
             image = RemoveVerticalSeam(image);
-            ReloadImage(image, AXIS_HORIZONTAL);
+            ReloadImage(image);
             Update();
             wxYield();
         }
     } else if (mode == DRAG_VERTICAL) {
-
+        mode = RESIZING;
+        int new_height = image.cols * size.GetHeight() / size.GetWidth();
+        while (image.rows > new_height) {
+            image = RemoveHorizontalSeam(image);
+            ReloadImage(image);
+            Update();
+            wxYield();
+        }
     }
     mode = BASE;
     max_size = size;

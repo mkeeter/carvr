@@ -41,10 +41,11 @@ cv::Mat GetVerticalEnergy(const cv::Mat& energy)
         summed.at<int32_t>(j, 0) += std::min(summed.at<int32_t>(j-1, 0),
                                              summed.at<int32_t>(j-1, 1));
 
-        const cv::Range r(j-1, j);
-        summed(cv::Range(j, j+1), mid) += cv::min(summed(r, mid),
-                                                  cv::min(summed(r, left),
-                                                          summed(r, right)));
+        const cv::Range this_row(j, j+1);
+        const cv::Range prev_row(j-1, j);
+        summed(this_row, mid) += cv::min(
+            summed(prev_row, mid), cv::min(summed(prev_row, left),
+                                           summed(prev_row, right)));
 
         summed.at<int32_t>(j, c) += std::min(summed.at<int32_t>(j-1, c-1),
                                              summed.at<int32_t>(j-1, c));
@@ -71,10 +72,11 @@ cv::Mat GetHorizontalEnergy(const cv::Mat& energy)
         summed.at<int32_t>(0, i) += std::min(summed.at<int32_t>(0, i-1),
                                              summed.at<int32_t>(1, i-1));
 
-        const cv::Range a(i-1, i);
-        summed(cv::Range(i, i+1), mid) += cv::min(summed(a, mid),
-                                                  cv::min(summed(a, lower),
-                                                          summed(a, upper)));
+        const cv::Range this_col(i, i+1);
+        const cv::Range prev_col(i-1, i);
+        summed(mid, this_col) += cv::min(
+            summed(mid, prev_col), cv::min(summed(lower, prev_col),
+                                           summed(upper, prev_col)));
 
         summed.at<int32_t>(r, i) += std::min(summed.at<int32_t>(r-1, i-1),
                                              summed.at<int32_t>(r, i-1));

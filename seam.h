@@ -11,5 +11,7 @@ Seam GetHorizontalSeam(const cv::Mat& summed);
 cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam);
 cv::Mat RemoveVerticalSeam(const cv::Mat& in, const Seam& seam);
 cv::Mat RemoveVerticalSeam(const cv::Mat& orig);
+cv::Mat RemoveHorizontalSeam(const cv::Mat& in, const Seam& seam);
+cv::Mat RemoveHorizontalSeam(const cv::Mat& orig);
 
 #endif
