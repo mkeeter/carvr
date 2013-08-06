@@ -129,7 +129,7 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 {
     mouse_position = event.GetPosition();
 
-    if (!bitmap.IsOk()) return;
+    if (!bitmap.IsOk() || mode == RESIZING) return;
 
     if      (arrow_h.Hit(mouse_position))    mode = DRAG_HORIZONTAL;
     else if (arrow_v.Hit(mouse_position))    mode = DRAG_VERTICAL;
@@ -171,7 +171,7 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 
 void ImagePanel::OnMouseMove(wxMouseEvent& event)
 {
-    if (!event.LeftIsDown())    mode = BASE;
+    if (!event.LeftIsDown() && mode != RESIZING)    mode = BASE;
 
     const wxPoint mp = event.GetPosition();
     bool changed = arrow_h.SendMousePosition(mp) ||
