@@ -4,6 +4,8 @@
 #include <wx/wx.h>
 #include <opencv2/opencv.hpp>
 
+#include "overlay.h"
+
 class ImagePanel : public wxPanel
 {
 public:
@@ -25,7 +27,7 @@ private:
     wxSize max_size;
     wxPoint mouse_position;
     wxBitmap bitmap;
-    wxBitmap arrow_h, arrow_v;
+    Overlay arrow_h, arrow_v;
 };
 
 #endif

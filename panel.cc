@@ -27,22 +27,11 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
         const int w = size.GetWidth();
         const int h = size.GetHeight();
         gc->DrawBitmap(bitmap, 0, 0, w, h);
+        if (drag_mode == HORIZONTAL)    arrow_h.Draw(*gc, 255);
+        else                            arrow_h.Draw(*gc);
 
-        if (drag_mode == HORIZONTAL)
-            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 150)));
-        else if (drag_mode == VERTICAL)
-            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 0)));
-        else if (drag_mode == NONE)
-            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
-        gc->DrawBitmap(arrow_h, 0, 0, w, h);
-
-        if (drag_mode == VERTICAL)
-            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 150)));
-        else if (drag_mode == HORIZONTAL)
-            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 0)));
-        else if (drag_mode == NONE)
-            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
-        gc->DrawBitmap(arrow_v, 0, 0, w, h);
+        if (drag_mode == VERTICAL)      arrow_v.Draw(*gc, 255);
+        else                            arrow_v.Draw(*gc);
 
     } else {
         gc->SetBrush(wxBrush(wxColour(200, 200, 200)));
@@ -71,10 +60,10 @@ void ImagePanel::OnResize(wxSizeEvent& WXUNUSED(event))
 void ImagePanel::MakeHorizontalArrow(void)
 {
     const wxSize size = GetSize();
-    arrow_h = wxBitmap(size, 1);
+    wxBitmap bitmap = wxBitmap(size, 1);
 
     wxMemoryDC dc;
-    dc.SelectObject(arrow_h);
+    dc.SelectObject(bitmap);
     dc.SetBrush(*wxWHITE_BRUSH);
     dc.Clear();
 
@@ -89,6 +78,8 @@ void ImagePanel::MakeHorizontalArrow(void)
     dc.SetBrush(*wxBLACK_BRUSH);
     dc.SetPen(wxNullPen);
     dc.DrawPolygon(7, points, size.GetWidth(), size.GetHeight()/2);
+
+    arrow_h = Overlay(bitmap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,10 +87,10 @@ void ImagePanel::MakeHorizontalArrow(void)
 void ImagePanel::MakeVerticalArrow(void)
 {
     const wxSize size = GetSize();
-    arrow_v = wxBitmap(size, 1);
+    wxBitmap bitmap = wxBitmap(size, 1);
 
     wxMemoryDC dc;
-    dc.SelectObject(arrow_v);
+    dc.SelectObject(bitmap);
     dc.SetBrush(*wxWHITE_BRUSH);
     dc.Clear();
 
@@ -114,6 +105,8 @@ void ImagePanel::MakeVerticalArrow(void)
     dc.SetBrush(*wxBLACK_BRUSH);
     dc.SetPen(wxNullPen);
     dc.DrawPolygon(7, points, size.GetWidth()/2, size.GetHeight());
+
+    arrow_v = Overlay(bitmap);
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -158,14 +151,10 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 
     if (!bitmap.IsOk()) return;
 
-    if (mouse_position.x >= GetSize().GetWidth() - DRAG_BORDER) {
-        drag_mode = HORIZONTAL;
-    }
-    else if (mouse_position.y >= GetSize().GetHeight() - DRAG_BORDER) {
-        drag_mode = VERTICAL;
-    } else {
-        drag_mode = NONE;
-    }
+    if      (arrow_h.Hit(mouse_position))    drag_mode = HORIZONTAL;
+    else if (arrow_v.Hit(mouse_position))    drag_mode = VERTICAL;
+    else                                     drag_mode = NONE;
+
     Refresh();
 }
 
@@ -185,9 +174,10 @@ void ImagePanel::OnMouseMove(wxMouseEvent& event)
     if (!event.LeftIsDown())    drag_mode = NONE;
 
     const wxPoint mp = event.GetPosition();
+    bool changed = arrow_h.SendMousePosition(mp) ||
+                   arrow_v.SendMousePosition(mp);
 
     wxSize size = GetSize();
-
     if (drag_mode == HORIZONTAL) {
         int new_width = size.GetWidth() + mp.x - mouse_position.x;
         if (new_width < DRAG_BORDER)
@@ -206,9 +196,11 @@ void ImagePanel::OnMouseMove(wxMouseEvent& event)
 
     if (size != GetSize())
     {
+        changed = false;
         SetSize(size);
         GetParent()->Fit();
     }
 
     mouse_position = mp;
+    if (changed)    Refresh();
 }
