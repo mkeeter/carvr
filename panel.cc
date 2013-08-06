@@ -2,6 +2,10 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+const wxSize ImagePanel::min_size(40, 40);
+
+////////////////////////////////////////////////////////////////////////////////
+
 ImagePanel::ImagePanel(wxFrame* parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(640, 480)),
       drag_mode(NONE), max_size(GetSize())
@@ -180,15 +184,15 @@ void ImagePanel::OnMouseMove(wxMouseEvent& event)
     wxSize size = GetSize();
     if (drag_mode == HORIZONTAL) {
         int new_width = size.GetWidth() + mp.x - mouse_position.x;
-        if (new_width < DRAG_BORDER)
-            new_width = DRAG_BORDER;
+        if (new_width < min_size.GetWidth())
+            new_width = min_size.GetWidth();
         if (new_width > max_size.GetWidth())
             new_width = max_size.GetWidth();
         size.SetWidth(new_width);
     } else if (drag_mode == VERTICAL) {
         int new_height = size.GetHeight() + mp.y - mouse_position.y;
-        if (new_height < DRAG_BORDER)
-            new_height = DRAG_BORDER;
+        if (new_height < min_size.GetHeight())
+            new_height = min_size.GetHeight();
         if (new_height > max_size.GetHeight())
             new_height = max_size.GetHeight();
         size.SetHeight(new_height);

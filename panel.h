@@ -21,7 +21,7 @@ private:
     void MakeHorizontalArrow();
     void MakeVerticalArrow();
 
-    const static int DRAG_BORDER = 20;
+    const static wxSize min_size;
     const static int ARROW_SIZE  = 40;
     enum {NONE, HORIZONTAL, VERTICAL} drag_mode;
     wxSize max_size;
