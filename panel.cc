@@ -142,24 +142,38 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 
 void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 {
+    if (mode == RESIZING)   return;
+
     const wxSize size = GetSize();
     if (mode == DRAG_HORIZONTAL) {
         mode = RESIZING;
-        int new_width = image.rows * size.GetWidth() / size.GetHeight();
+        const int new_width = image.rows *
+                              size.GetWidth() / size.GetHeight();
+        const int tick = image.rows / size.GetHeight();
+        int tock = 0;
         while (image.cols > new_width) {
             image = RemoveVerticalSeam(image);
-            ReloadImage(image);
-            Update();
-            wxYield();
+            if (tock++ >= tick) {
+                tock = 0;
+                ReloadImage(image);
+                Update();
+                wxYield();
+            }
         }
     } else if (mode == DRAG_VERTICAL) {
         mode = RESIZING;
-        int new_height = image.cols * size.GetHeight() / size.GetWidth();
+        const int new_height = image.cols *
+                               size.GetHeight() / size.GetWidth();
+        const int tick = image.cols / size.GetWidth();
+        int tock = 0;
         while (image.rows > new_height) {
             image = RemoveHorizontalSeam(image);
-            ReloadImage(image);
-            Update();
-            wxYield();
+            if (tock++ >= tick) {
+                tock = 0;
+                ReloadImage(image);
+                Update();
+                wxYield();
+            }
         }
     }
     mode = BASE;
