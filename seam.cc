@@ -1,4 +1,5 @@
 #include "seam.h"
+#include "energy.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -101,4 +102,14 @@ cv::Mat RemoveVerticalSeam(const cv::Mat& in, const Seam& seam)
     }
 
     return out;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+cv::Mat RemoveVerticalSeam(const cv::Mat& orig)
+{
+    const cv::Mat energy = GetEnergy(orig);
+    const cv::Mat vertical = GetVerticalEnergy(energy);
+    const Seam seam = GetVerticalSeam(vertical);
+    return RemoveVerticalSeam(orig, seam);
 }

@@ -13,17 +13,21 @@ public:
     void OnPaint(wxPaintEvent& event);
     void LoadImage(cv::Mat& image);
 private:
+    const static wxSize min_size;
+    enum Axis {AXIS_HORIZONTAL, AXIS_VERTICAL};
+
     void OnMouseLDown(wxMouseEvent& event);
     void OnMouseLUp(wxMouseEvent& event);
     void OnMouseMove(wxMouseEvent& event);
     void OnResize(wxSizeEvent& event);
 
-    const static wxSize min_size;
+    void ReloadImage(cv::Mat& cv_image, Axis a);
 
-    enum {NONE, HORIZONTAL, VERTICAL} drag_mode;
+    enum {BASE, DRAG_HORIZONTAL, DRAG_VERTICAL, RESIZING} mode;
+    cv::Mat image;
+    wxBitmap bitmap;
     wxSize max_size;
     wxPoint mouse_position;
-    wxBitmap bitmap;
     Overlay arrow_h, arrow_v;
 };
 
