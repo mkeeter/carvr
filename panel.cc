@@ -1,4 +1,5 @@
 #include "panel.h"
+#include "bitmaps.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -8,16 +9,14 @@ const wxSize ImagePanel::min_size(40, 40);
 
 ImagePanel::ImagePanel(wxFrame* parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(640, 480)),
-      drag_mode(NONE), max_size(GetSize())
+      drag_mode(NONE), max_size(GetSize()),
+      arrow_h(HorizontalArrow(max_size)), arrow_v(VerticalArrow(max_size))
 {
     Bind(wxEVT_PAINT, &ImagePanel::OnPaint, this);
     Bind(wxEVT_MOTION, &ImagePanel::OnMouseMove, this);
     Bind(wxEVT_LEFT_DOWN, &ImagePanel::OnMouseLDown, this);
     Bind(wxEVT_LEFT_UP, &ImagePanel::OnMouseLUp, this);
     Bind(wxEVT_SIZE, &ImagePanel::OnResize, this);
-
-    MakeHorizontalArrow();
-    MakeVerticalArrow();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,63 +54,11 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 void ImagePanel::OnResize(wxSizeEvent& WXUNUSED(event))
 {
-    MakeHorizontalArrow();
-    MakeVerticalArrow();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-void ImagePanel::MakeHorizontalArrow(void)
-{
     const wxSize size = GetSize();
-    wxBitmap bitmap = wxBitmap(size, 1);
-
-    wxMemoryDC dc;
-    dc.SelectObject(bitmap);
-    dc.SetBrush(*wxWHITE_BRUSH);
-    dc.Clear();
-
-    wxPoint points[] = {
-        wxPoint(0, ARROW_SIZE/4),
-        wxPoint(-ARROW_SIZE/2, ARROW_SIZE/4),
-        wxPoint(-ARROW_SIZE/2, ARROW_SIZE/2),
-        wxPoint(-ARROW_SIZE, 0),
-        wxPoint(-ARROW_SIZE/2, -ARROW_SIZE/2),
-        wxPoint(-ARROW_SIZE/2, -ARROW_SIZE/4),
-        wxPoint(0, -ARROW_SIZE/4)};
-    dc.SetBrush(*wxBLACK_BRUSH);
-    dc.SetPen(wxNullPen);
-    dc.DrawPolygon(7, points, size.GetWidth(), size.GetHeight()/2);
-
-    arrow_h = Overlay(bitmap);
+    arrow_h = HorizontalArrow(size);
+    arrow_v = VerticalArrow(size);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-void ImagePanel::MakeVerticalArrow(void)
-{
-    const wxSize size = GetSize();
-    wxBitmap bitmap = wxBitmap(size, 1);
-
-    wxMemoryDC dc;
-    dc.SelectObject(bitmap);
-    dc.SetBrush(*wxWHITE_BRUSH);
-    dc.Clear();
-
-    wxPoint points[] = {
-        wxPoint(ARROW_SIZE/4, 0),
-        wxPoint(ARROW_SIZE/4, -ARROW_SIZE/2),
-        wxPoint(ARROW_SIZE/2, -ARROW_SIZE/2),
-        wxPoint(0, -ARROW_SIZE),
-        wxPoint(-ARROW_SIZE/2, -ARROW_SIZE/2),
-        wxPoint(-ARROW_SIZE/4, -ARROW_SIZE/2),
-        wxPoint(-ARROW_SIZE/4, 0)};
-    dc.SetBrush(*wxBLACK_BRUSH);
-    dc.SetPen(wxNullPen);
-    dc.DrawPolygon(7, points, size.GetWidth()/2, size.GetHeight());
-
-    arrow_v = Overlay(bitmap);
-}
 ////////////////////////////////////////////////////////////////////////////////
 
 void ImagePanel::LoadImage(cv::Mat& cv_image)

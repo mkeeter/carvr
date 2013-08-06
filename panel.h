@@ -18,11 +18,8 @@ private:
     void OnMouseMove(wxMouseEvent& event);
     void OnResize(wxSizeEvent& event);
 
-    void MakeHorizontalArrow();
-    void MakeVerticalArrow();
-
     const static wxSize min_size;
-    const static int ARROW_SIZE  = 40;
+
     enum {NONE, HORIZONTAL, VERTICAL} drag_mode;
     wxSize max_size;
     wxPoint mouse_position;
