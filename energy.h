@@ -3,8 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 
-cv::Mat GetEnergy(const cv::Mat& orig);
-cv::Mat GetVerticalEnergy(const cv::Mat& energy);
-cv::Mat GetHorizontalEnergy(const cv::Mat& energy);
+void GetVerticalEnergy(const cv::Mat& energy, cv::Mat& summed);
+void GetHorizontalEnergy(const cv::Mat& energy, cv::Mat& summed);
 
 #endif

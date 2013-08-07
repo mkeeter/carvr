@@ -32,8 +32,7 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
 
     if (open_dialog->ShowModal() == wxID_OK) {
         const std::string filename = open_dialog->GetPath().ToStdString();
-        cv::Mat image = cv::imread(filename);
-        panel->LoadImage(image);
+        panel->LoadImage(filename);
     }
 
     open_dialog->Destroy();

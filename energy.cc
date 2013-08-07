@@ -2,33 +2,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Calculates the energy of the image, normalized to 8-bit values.
-cv::Mat GetEnergy(const cv::Mat& orig)
-{
-    // Convert the image to greyscale
-    cv::Mat gray;
-    cv::cvtColor(orig, gray, CV_BGR2GRAY);
-
-    // Find horizontal derivative
-    cv::Mat h;
-    cv::Sobel(gray, h, CV_16S, 1, 0);
-
-    // Find vertical derivative
-    cv::Mat v;
-    cv::Sobel(gray, v, CV_16S, 0, 1);
-
-    // Return the sum of the two
-    cv::Mat energy = cv::abs(h) + cv::abs(v);
-    energy.convertTo(energy, CV_32S);
-    return energy;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 // Calculates cumulative energy going down the image.
-cv::Mat GetVerticalEnergy(const cv::Mat& energy)
+void GetVerticalEnergy(const cv::Mat& energy, cv::Mat& summed)
 {
-    cv::Mat summed;
     energy.copyTo(summed);
 
     const int c = summed.cols - 1;
@@ -50,16 +26,13 @@ cv::Mat GetVerticalEnergy(const cv::Mat& energy)
         summed.at<int32_t>(j, c) += std::min(summed.at<int32_t>(j-1, c-1),
                                              summed.at<int32_t>(j-1, c));
     }
-
-    return summed;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 // Calculates cumulative energy going across the image.
-cv::Mat GetHorizontalEnergy(const cv::Mat& energy)
+void GetHorizontalEnergy(const cv::Mat& energy, cv::Mat& summed)
 {
-    cv::Mat summed;
     energy.copyTo(summed);
 
     const int r = summed.rows - 1;
@@ -81,7 +54,5 @@ cv::Mat GetHorizontalEnergy(const cv::Mat& energy)
         summed.at<int32_t>(r, i) += std::min(summed.at<int32_t>(r-1, i-1),
                                              summed.at<int32_t>(r, i-1));
     }
-
-    return summed;
 }
 

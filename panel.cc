@@ -1,9 +1,6 @@
 #include "panel.h"
 #include "bitmaps.h"
 
-#include "seam.h"
-#include "energy.h"
-
 ////////////////////////////////////////////////////////////////////////////////
 
 const wxSize ImagePanel::min_size(40, 40);
@@ -13,7 +10,8 @@ const wxSize ImagePanel::min_size(40, 40);
 ImagePanel::ImagePanel(wxFrame* parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(640, 480)),
       mode(BASE), max_size(GetSize()),
-      arrow_h(HorizontalArrow(max_size)), arrow_v(VerticalArrow(max_size))
+      arrow_h(HorizontalArrow(max_size)),
+      arrow_v(VerticalArrow(max_size))
 {
     Bind(wxEVT_PAINT, &ImagePanel::OnPaint, this);
     Bind(wxEVT_MOTION, &ImagePanel::OnMouseMove, this);
@@ -30,9 +28,7 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
     const wxSize size = GetSize();
 
     if (bitmap.IsOk()) {
-        const int w = size.GetWidth();
-        const int h = size.GetHeight();
-        gc->DrawBitmap(bitmap, 0, 0, w, h);
+        gc->DrawBitmap(bitmap, 0, 0, size.GetWidth(), size.GetHeight());
         if (mode != RESIZING) {
             if (mode == DRAG_HORIZONTAL)    arrow_h.Draw(*gc, 255);
             else                            arrow_h.Draw(*gc);
@@ -40,7 +36,6 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
             if (mode == DRAG_VERTICAL)      arrow_v.Draw(*gc, 255);
             else                            arrow_v.Draw(*gc);
         }
-
     } else {
         gc->SetBrush(wxBrush(wxColour(200, 200, 200)));
         gc->DrawRectangle(0, 0, size.GetWidth(), size.GetHeight());
@@ -66,60 +61,23 @@ void ImagePanel::OnResize(wxSizeEvent& WXUNUSED(event))
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ImagePanel::LoadImage(cv::Mat& cv_image)
+void ImagePanel::LoadImage(std::string filename)
 {
-    assert(cv_image.type() == CV_8UC3);
-    image = cv_image;
+    image = Image(filename);
+    bitmap = image.GetBitmap();
 
-    uint8_t* const img_data = (uint8_t*)malloc(cv_image.rows*cv_image.cols*3);
-    int a=0;
-    for (int j=0; j < cv_image.rows; ++j) {
-        for (int i=0; i < cv_image.cols; ++i) {
-            cv::Vec3b pixel = cv_image.at<cv::Vec3b>(j, i);
-            img_data[a++] = pixel[2];
-            img_data[a++] = pixel[1];
-            img_data[a++] = pixel[0];
-        }
-    }
-
-    wxImage wx_image(cv_image.cols, cv_image.rows, img_data);
-    bitmap = wxBitmap(wx_image);
-
-    if (cv_image.cols > cv_image.rows && cv_image.cols > 640) {
-        SetSize(wxDefaultCoord, wxDefaultCoord,
-                640, 640*cv_image.rows/cv_image.cols);
-    } else if (cv_image.rows > 640) {
-        SetSize(wxDefaultCoord, wxDefaultCoord,
-                640*cv_image.cols/cv_image.rows, 640);
+    const int w = bitmap.GetWidth();
+    const int h = bitmap.GetHeight();
+    if (w > h && w > 640) {
+        SetSize(wxDefaultCoord, wxDefaultCoord, 640, 640*h/w);
+    } else if (h > 640) {
+        SetSize(wxDefaultCoord, wxDefaultCoord, 640*w/h, 640);
     } else {
-        SetSize(wxDefaultCoord, wxDefaultCoord, cv_image.cols, cv_image.rows);
+        SetSize(wxDefaultCoord, wxDefaultCoord, w, h);
     }
-
     max_size = GetSize();
+
     GetParent()->Fit();
-    Refresh();
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-void ImagePanel::ReloadImage(cv::Mat& cv_image)
-{
-    assert(cv_image.type() == CV_8UC3);
-
-    uint8_t* const img_data = (uint8_t*)malloc(cv_image.rows*cv_image.cols*3);
-    int a=0;
-    for (int j=0; j < cv_image.rows; ++j) {
-        for (int i=0; i < cv_image.cols; ++i) {
-            cv::Vec3b pixel = cv_image.at<cv::Vec3b>(j, i);
-            img_data[a++] = pixel[2];
-            img_data[a++] = pixel[1];
-            img_data[a++] = pixel[0];
-        }
-    }
-
-    wxImage wx_image(cv_image.cols, cv_image.rows, img_data);
-    bitmap = wxBitmap(wx_image);
-
     Refresh();
 }
 
@@ -131,9 +89,9 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 
     if (!bitmap.IsOk() || mode == RESIZING) return;
 
-    if      (arrow_h.Hit(mouse_position))    mode = DRAG_HORIZONTAL;
-    else if (arrow_v.Hit(mouse_position))    mode = DRAG_VERTICAL;
-    else                                     mode = BASE;
+    if      (arrow_h.Hit(mouse_position))   mode = DRAG_HORIZONTAL;
+    else if (arrow_v.Hit(mouse_position))   mode = DRAG_VERTICAL;
+    else                                    mode = BASE;
 
     Refresh();
 }
@@ -147,37 +105,37 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
     const wxSize size = GetSize();
     if (mode == DRAG_HORIZONTAL) {
         mode = RESIZING;
-        const int new_width = image.rows *
+        const int new_width = bitmap.GetHeight() *
                               size.GetWidth() / size.GetHeight();
-        const int tick = image.rows / size.GetHeight();
-        int tock = 0;
-        while (image.cols > new_width) {
-            image = RemoveVerticalSeam(image);
-            if (tock++ >= tick) {
-                tock = 0;
-                ReloadImage(image);
+        const int tick = bitmap.GetHeight() / size.GetHeight();
+        for (int w = bitmap.GetWidth(); w > new_width; --w)
+        {
+            image.RemoveVerticalSeam();
+            if (w % tick == 0) {
+                bitmap = image.GetBitmap();
                 Update();
                 wxYield();
             }
         }
     } else if (mode == DRAG_VERTICAL) {
         mode = RESIZING;
-        const int new_height = image.cols *
+        const int new_height = bitmap.GetWidth() *
                                size.GetHeight() / size.GetWidth();
-        const int tick = image.cols / size.GetWidth();
-        int tock = 0;
-        while (image.rows > new_height) {
-            image = RemoveHorizontalSeam(image);
-            if (tock++ >= tick) {
-                tock = 0;
-                ReloadImage(image);
+        const int tick = bitmap.GetWidth() / size.GetWidth();
+        for (int h=bitmap.GetHeight(); h > new_height; --h) {
+            image.RemoveHorizontalSeam();
+            if (h % tick == 0) {
+                bitmap = image.GetBitmap();
                 Update();
                 wxYield();
             }
         }
     }
+
+    bitmap = image.GetBitmap();
     mode = BASE;
     max_size = size;
+    Update();
     Refresh();
 }
 

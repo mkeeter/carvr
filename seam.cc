@@ -51,10 +51,8 @@ cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cv::Mat RemoveVerticalSeam(const cv::Mat& in, const Seam& seam)
+void RemoveVerticalSeam(const cv::Mat& in, const Seam& seam, cv::Mat& out)
 {
-    cv::Mat out(cv::Size(in.cols-1, in.rows), in.type());
-
     Seam::const_iterator index = seam.begin();
 
     for (int j=0; j < in.rows; ++j, ++index) {
@@ -68,20 +66,7 @@ cv::Mat RemoveVerticalSeam(const cv::Mat& in, const Seam& seam)
                     out(r, cv::Range(*index, out.cols)));
         }
     }
-
-    return out;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-cv::Mat RemoveVerticalSeam(const cv::Mat& orig)
-{
-    const cv::Mat energy = GetEnergy(orig);
-    const cv::Mat vertical = GetVerticalEnergy(energy);
-    const Seam seam = GetVerticalSeam(vertical);
-    return RemoveVerticalSeam(orig, seam);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 Seam GetHorizontalSeam(const cv::Mat& summed)
@@ -116,10 +101,8 @@ Seam GetHorizontalSeam(const cv::Mat& summed)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cv::Mat RemoveHorizontalSeam(const cv::Mat& in, const Seam& seam)
+void RemoveHorizontalSeam(const cv::Mat& in, const Seam& seam, cv::Mat& out)
 {
-    cv::Mat out(cv::Size(in.cols, in.rows-1), in.type());
-
     Seam::const_iterator index = seam.begin();
 
     for (int i=0; i < in.cols; ++i, ++index) {
@@ -133,16 +116,5 @@ cv::Mat RemoveHorizontalSeam(const cv::Mat& in, const Seam& seam)
                     out(cv::Range(*index, out.rows), r));
         }
     }
-
-    return out;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-cv::Mat RemoveHorizontalSeam(const cv::Mat& orig)
-{
-    const cv::Mat energy = GetEnergy(orig);
-    const cv::Mat horizontal = GetHorizontalEnergy(energy);
-    const Seam seam = GetHorizontalSeam(horizontal);
-    return RemoveHorizontalSeam(orig, seam);
-}

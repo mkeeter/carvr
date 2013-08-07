@@ -5,13 +5,14 @@
 #include <opencv2/opencv.hpp>
 
 #include "overlay.h"
+#include "image.h"
 
 class ImagePanel : public wxPanel
 {
 public:
     ImagePanel(wxFrame* parent);
     void OnPaint(wxPaintEvent& event);
-    void LoadImage(cv::Mat& image);
+    void LoadImage(std::string filename);
 private:
     const static wxSize min_size;
 
@@ -20,10 +21,8 @@ private:
     void OnMouseMove(wxMouseEvent& event);
     void OnResize(wxSizeEvent& event);
 
-    void ReloadImage(cv::Mat& cv_image);
-
     enum {BASE, DRAG_HORIZONTAL, DRAG_VERTICAL, RESIZING} mode;
-    cv::Mat image;
+    Image image;
     wxBitmap bitmap;
     wxSize max_size;
     wxPoint mouse_position;
