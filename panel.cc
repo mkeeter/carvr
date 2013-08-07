@@ -113,6 +113,7 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
             image.RemoveVerticalSeam();
             if (w % tick == 0) {
                 bitmap = image.GetBitmap();
+                Refresh();
                 Update();
                 wxYield();
             }
@@ -126,6 +127,7 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
             image.RemoveHorizontalSeam();
             if (h % tick == 0) {
                 bitmap = image.GetBitmap();
+                Refresh();
                 Update();
                 wxYield();
             }
@@ -135,7 +137,6 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
     bitmap = image.GetBitmap();
     mode = BASE;
     max_size = size;
-    Update();
     Refresh();
 }
 

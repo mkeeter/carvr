@@ -14,6 +14,8 @@ Image::Image(std::string filename)
 
 wxBitmap Image::GetBitmap() const
 {
+    if (img.empty())    return wxBitmap();
+
     // Generate the bitmap if it doesn't exist or is of an incorrect size
     uint8_t* const img_data = (uint8_t*)malloc(img.rows*img.cols*3);
     int a=0;
@@ -62,7 +64,7 @@ void Image::RemoveHorizontalSeam()
     ::RemoveHorizontalSeam(img, seam);
     ::RemoveHorizontalSeam(bw,  seam);
 
-    ChangeImageSizes(cv::Range::all(), cv::Range(0, img.cols - 1));
+    ChangeImageSizes(cv::Range(0, img.rows-1), cv::Range::all());
     RecalculateEnergy();
 }
 
@@ -76,7 +78,7 @@ void Image::RemoveVerticalSeam()
     ::RemoveVerticalSeam(img, seam);
     ::RemoveVerticalSeam(bw,  seam);
 
-    ChangeImageSizes(cv::Range(0, img.rows-1), cv::Range::all());
+    ChangeImageSizes(cv::Range::all(), cv::Range(0, img.cols - 1));
     RecalculateEnergy();
 }
 
