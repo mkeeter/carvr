@@ -51,19 +51,18 @@ cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void RemoveVerticalSeam(const cv::Mat& in, const Seam& seam, cv::Mat& out)
+void RemoveVerticalSeam(cv::Mat& in, const Seam& seam)
 {
     Seam::const_iterator index = seam.begin();
 
-    for (int j=0; j < in.rows; ++j, ++index) {
-        const cv::Range r(j, j+1);
-        if (*index > 0) {
-            in(r, cv::Range(0, *index)).copyTo(
-                    out(r, cv::Range(0, *index)));
-        }
-        if (*index < in.cols - 1) {
-            in(r, cv::Range(*index+1, in.cols)).copyTo(
-                    out(r, cv::Range(*index, out.cols)));
+    for (int r=0; r < in.rows; ++r) {
+        for (int c=*(index++); c < in.cols-1; ++c) {
+            if (in.type() == CV_8UC3)
+                in.at<cv::Vec3b>(r, c) = in.at<cv::Vec3b>(r, c+1);
+            else if (in.type() == CV_8UC1)
+                in.at<uint8_t>(r, c) = in.at<uint8_t>(r, c+1);
+            else
+                assert(false);
         }
     }
 }
@@ -101,19 +100,19 @@ Seam GetHorizontalSeam(const cv::Mat& summed)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void RemoveHorizontalSeam(const cv::Mat& in, const Seam& seam, cv::Mat& out)
+void RemoveHorizontalSeam(cv::Mat& in, const Seam& seam)
 {
     Seam::const_iterator index = seam.begin();
 
-    for (int i=0; i < in.cols; ++i, ++index) {
-        const cv::Range r(i, i+1);
-        if (*index > 0) {
-            in(cv::Range(0, *index), r).copyTo(
-                    out(cv::Range(0, *index), r));
-        }
-        if (*index < in.rows - 1) {
-            in(cv::Range(*index+1, in.rows), r).copyTo(
-                    out(cv::Range(*index, out.rows), r));
+    for (int c=0; c < in.cols; ++c) {
+        for (int r=*(index++); r < in.rows - 1; r++)
+        {
+            if (in.type() == CV_8UC3)
+                in.at<cv::Vec3b>(r, c) = in.at<cv::Vec3b>(r+1, c);
+            else if (in.type() == CV_8UC1)
+                in.at<uint8_t>(r, c) = in.at<uint8_t>(r+1, c);
+            else
+                assert(false);
         }
     }
 }

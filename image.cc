@@ -8,9 +8,6 @@ Image::Image(std::string filename)
 {
     cv::cvtColor(img, bw, CV_BGR2GRAY);
     RecalculateEnergy();
-
-    summed_h = cv::Mat(img.rows, img.cols, CV_32S);
-    summed_v = cv::Mat(img.rows, img.cols, CV_32S);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -37,7 +34,7 @@ wxBitmap Image::GetBitmap() const
 void Image::RecalculateEnergy()
 {
     cv::Sobel(bw, sobel_h, CV_16S, 1, 0);
-    cv::Sobel(bw, sobel_h, CV_16S, 0, 0);
+    cv::Sobel(bw, sobel_v, CV_16S, 0, 1);
 
     energy16 = cv::abs(sobel_h) + cv::abs(sobel_v);
     energy16.convertTo(energy32, CV_32S);
@@ -62,13 +59,10 @@ void Image::RemoveHorizontalSeam()
     GetHorizontalEnergy(energy32, summed_h);
     Seam seam = GetHorizontalSeam(summed_h);
 
-    cv::Range c(0, img.cols - 1);
-    cv::Mat new_img = img.colRange(c);
-    cv::Mat new_bw  = bw.colRange(c);
-    ::RemoveHorizontalSeam(img, seam, new_img);
-    ::RemoveHorizontalSeam(bw,  seam, new_bw);
+    ::RemoveHorizontalSeam(img, seam);
+    ::RemoveHorizontalSeam(bw,  seam);
 
-    ChangeImageSizes(cv::Range::all(), c);
+    ChangeImageSizes(cv::Range::all(), cv::Range(0, img.cols - 1));
     RecalculateEnergy();
 }
 
@@ -79,13 +73,10 @@ void Image::RemoveVerticalSeam()
     GetVerticalEnergy(energy32, summed_v);
     Seam seam = GetVerticalSeam(summed_v);
 
-    cv::Range r(0, img.rows - 1);
-    cv::Mat new_img = img.rowRange(r);
-    cv::Mat new_bw  = bw.rowRange(r);
-    ::RemoveVerticalSeam(img, seam, new_img);
-    ::RemoveVerticalSeam(bw,  seam, new_bw);
+    ::RemoveVerticalSeam(img, seam);
+    ::RemoveVerticalSeam(bw,  seam);
 
-    ChangeImageSizes(r, cv::Range::all());
+    ChangeImageSizes(cv::Range(0, img.rows-1), cv::Range::all());
     RecalculateEnergy();
 }
 

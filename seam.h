@@ -9,7 +9,7 @@ typedef std::list<int> Seam;
 Seam GetVerticalSeam(const cv::Mat& summed);
 Seam GetHorizontalSeam(const cv::Mat& summed);
 cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam);
-void RemoveVerticalSeam(const cv::Mat& in, const Seam& seam, cv::Mat& out);
-void RemoveHorizontalSeam(const cv::Mat& in, const Seam& seam, cv::Mat& out);
+void RemoveVerticalSeam(cv::Mat& in, const Seam& seam);
+void RemoveHorizontalSeam(cv::Mat& in, const Seam& seam);
 
 #endif
