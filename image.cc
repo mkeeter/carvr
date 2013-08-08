@@ -4,11 +4,25 @@
 #include "seam.h"
 
 Image::Image(std::string filename)
-    : filename(filename), img(cv::imread(filename))
+    : filename(filename), img(cv::imread(filename)), transposed(false)
 {
     cv::cvtColor(img, bw, CV_BGR2GRAY);
-    energy16 = cv::Mat(img.rows, img.cols, CV_16U);
+    energy16   = cv::Mat(img.rows, img.cols, CV_16U);
+    summed     = cv::Mat(img.rows, img.cols, CV_32S);
     RecalculateEnergy();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Image::TransposeMatrices()
+{
+    cv::Mat* matrices[] = {&img, &bw, &sobel_h, &sobel_v,
+                           &energy16, &energy32, &summed};
+    for (int i=0; i < 7; ++i) {
+        cv::transpose(*matrices[i], *matrices[i]);
+    }
+
+    transposed = !transposed;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -19,16 +33,30 @@ wxBitmap Image::GetBitmap() const
 
     // Generate the bitmap if it doesn't exist or is of an incorrect size
     uint8_t* const img_data = (uint8_t*)malloc(img.rows*img.cols*3);
+
     int a=0;
-    for (int j=0; j < img.rows; ++j) {
+    if (transposed) {
         for (int i=0; i < img.cols; ++i) {
-            cv::Vec3b pixel = img.at<cv::Vec3b>(j, i);
-            img_data[a++] = pixel[2];
-            img_data[a++] = pixel[1];
-            img_data[a++] = pixel[0];
+            for (int j=0; j < img.rows; ++j) {
+                cv::Vec3b pixel = img.at<cv::Vec3b>(j, i);
+                img_data[a++] = pixel[2];
+                img_data[a++] = pixel[1];
+                img_data[a++] = pixel[0];
+            }
+        }
+    } else {
+        for (int j=0; j < img.rows; ++j) {
+            for (int i=0; i < img.cols; ++i) {
+                cv::Vec3b pixel = img.at<cv::Vec3b>(j, i);
+                img_data[a++] = pixel[2];
+                img_data[a++] = pixel[1];
+                img_data[a++] = pixel[0];
+            }
         }
     }
-    wxImage wx_image(img.cols, img.rows, img_data);
+
+    wxImage wx_image(transposed ? img.rows : img.cols,
+                     transposed ? img.cols : img.rows, img_data);
     return wxBitmap(wx_image);
 }
 
@@ -62,27 +90,30 @@ void Image::ChangeImageSizes(const cv::Range r, const cv::Range c)
 
 void Image::RemoveHorizontalSeam()
 {
-    GetHorizontalEnergy(energy32, summed_h);
-    Seam seam = GetHorizontalSeam(summed_h);
-
-    ::RemoveHorizontalSeam(img, seam);
-    ::RemoveHorizontalSeam(bw,  seam);
-
-    ChangeImageSizes(cv::Range(0, img.rows-1), cv::Range::all());
-    RecalculateEnergy();
+    if (!transposed)    TransposeMatrices();
+    RemoveSeam();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 void Image::RemoveVerticalSeam()
 {
-    GetVerticalEnergy(energy32, summed_v);
-    Seam seam = GetVerticalSeam(summed_v);
+    if (transposed)     TransposeMatrices();
+    RemoveSeam();
+}
 
-    ::RemoveVerticalSeam(img, seam);
-    ::RemoveVerticalSeam(bw,  seam);
+////////////////////////////////////////////////////////////////////////////////
 
-    ChangeImageSizes(cv::Range::all(), cv::Range(0, img.cols - 1));
+void Image::RemoveSeam()
+{
+    GetEnergy(energy32, summed);
+    Seam seam = GetSeam(summed);
+
+    ::RemoveSeam(img, seam);
+    ::RemoveSeam(bw,  seam);
+
+    ChangeImageSizes(cv::Range::all(), cv::Range(0, img.cols-1));
     RecalculateEnergy();
 }
+
 

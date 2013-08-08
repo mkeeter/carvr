@@ -3,7 +3,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Seam GetVerticalSeam(const cv::Mat& summed)
+Seam GetSeam(const cv::Mat& summed)
 {
     // Find the minimum point on the top row
     int index;
@@ -36,7 +36,7 @@ Seam GetVerticalSeam(const cv::Mat& summed)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam)
+cv::Mat DrawSeam(const cv::Mat& in, const Seam& seam)
 {
     cv::Mat out;
     in.copyTo(out);
@@ -51,7 +51,7 @@ cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void RemoveVerticalSeam(cv::Mat& in, const Seam& seam)
+void RemoveSeam(cv::Mat& in, const Seam& seam)
 {
     const int type = in.type();
     assert(type == CV_8UC3 || type == CV_8UC1);
@@ -64,54 +64,5 @@ void RemoveVerticalSeam(cv::Mat& in, const Seam& seam)
         memcpy(ptr + i*size, ptr + (i+1)*size, (in.cols - (i+1))*size);
     }
 }
-////////////////////////////////////////////////////////////////////////////////
-
-Seam GetHorizontalSeam(const cv::Mat& summed)
-{
-    // Find the minimum point on the far right column
-    int index;
-    {
-        cv::Point min_pt;
-        cv::minMaxLoc(summed.col(summed.cols - 1),
-                      NULL, NULL, &min_pt);
-        index = min_pt.y;
-    }
-
-    Seam seam;
-    seam.push_back(index);
-
-    for (int j=summed.cols - 2; j >= 0; --j) {
-        const int a = index == 0 ?
-                      INT_MAX : summed.at<int>(index - 1, j);
-        const int b = summed.at<int>(index, j);
-        const int c = (index == summed.rows - 1) ?
-                      INT_MAX : summed.at<int>(index + 1, j);
-        if (a < b && a < c) {
-            index--;
-        } else if (c < a && c < b) {
-            index++;
-        }
-        seam.push_front(index);
-    }
-    return seam;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
-
-void RemoveHorizontalSeam(cv::Mat& in, const Seam& seam)
-{
-    Seam::const_iterator index = seam.begin();
-
-    for (int c=0; c < in.cols; ++c) {
-        for (int r=*(index++); r < in.rows - 1; r++)
-        {
-            if (in.type() == CV_8UC3)
-                in.at<cv::Vec3b>(r, c) = in.at<cv::Vec3b>(r+1, c);
-            else if (in.type() == CV_8UC1)
-                in.at<uint8_t>(r, c) = in.at<uint8_t>(r+1, c);
-            else
-                assert(false);
-        }
-    }
-}
-

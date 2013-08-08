@@ -17,6 +17,8 @@ public:
 private:
     void RecalculateEnergy();
     void ChangeImageSizes(const cv::Range r, const cv::Range c);
+    void RemoveSeam();
+    void TransposeMatrices();
 
     std::string filename;
 
@@ -28,7 +30,9 @@ private:
 
     // These matrices should always be of the correct size,
     // but only hold valid data when it is being used to find a seam.
-    cv::Mat summed_h, summed_v;
+    cv::Mat summed;
+
+    bool transposed;
 };
 
 #endif

@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Calculates cumulative energy going down the image.
-void GetVerticalEnergy(const cv::Mat& energy, cv::Mat& summed)
+void GetEnergy(const cv::Mat& energy, cv::Mat& summed)
 {
     energy.copyTo(summed);
 
@@ -29,30 +29,3 @@ void GetVerticalEnergy(const cv::Mat& energy, cv::Mat& summed)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-// Calculates cumulative energy going across the image.
-void GetHorizontalEnergy(const cv::Mat& energy, cv::Mat& summed)
-{
-    energy.copyTo(summed);
-
-    const int r = summed.rows - 1;
-    const cv::Range lower(0, r-1);
-    const cv::Range mid(1, r);
-    const cv::Range upper(2, r+1);
-
-    // Build up energy map for horizontal seams.
-    for(int i = 1; i < energy.cols; ++i) {
-        summed.at<int32_t>(0, i) += std::min(summed.at<int32_t>(0, i-1),
-                                             summed.at<int32_t>(1, i-1));
-
-        const cv::Range this_col(i, i+1);
-        const cv::Range prev_col(i-1, i);
-        summed(mid, this_col) += cv::min(
-            summed(mid, prev_col), cv::min(summed(lower, prev_col),
-                                           summed(upper, prev_col)));
-
-        summed.at<int32_t>(r, i) += std::min(summed.at<int32_t>(r-1, i-1),
-                                             summed.at<int32_t>(r, i-1));
-    }
-}
-
