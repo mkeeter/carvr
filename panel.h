@@ -27,6 +27,7 @@ private:
     wxSize max_size;
     wxPoint mouse_position;
     Overlay arrow_h, arrow_v;
+    wxBitmap progress;
 };
 
 #endif

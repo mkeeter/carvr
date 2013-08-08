@@ -29,7 +29,10 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
     if (bitmap.IsOk()) {
         gc->DrawBitmap(bitmap, 0, 0, size.GetWidth(), size.GetHeight());
-        if (mode != RESIZING) {
+        if (mode == RESIZING && progress.IsOk()) {
+            gc->SetBrush(wxBrush(wxColour(255, 255, 255, 100)));
+            gc->DrawBitmap(progress, 0, 0, size.GetWidth(), size.GetHeight());
+        } else {
             if (mode == DRAG_HORIZONTAL)    arrow_h.Draw(*gc, 255);
             else                            arrow_h.Draw(*gc);
 
@@ -101,18 +104,19 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 {
     if (mode == RESIZING)   return;
-
+    progress = ProgressBar(GetSize(), 0.5);
     const wxSize size = GetSize();
     if (mode == DRAG_HORIZONTAL) {
         mode = RESIZING;
         const int new_width = bitmap.GetHeight() *
                               size.GetWidth() / size.GetHeight();
         const int tick = bitmap.GetHeight() / size.GetHeight();
-        for (int w = bitmap.GetWidth(); w > new_width; --w)
-        {
+        int dw = bitmap.GetWidth() - new_width;
+        for (int w = 0; w < dw; ++w) {
             image.RemoveVerticalSeam();
             if (w % tick == 0) {
                 bitmap = image.GetBitmap();
+                progress = ProgressBar(size, w/float(dw));
                 Refresh();
                 Update();
                 wxYield();
@@ -123,10 +127,12 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
         const int new_height = bitmap.GetWidth() *
                                size.GetHeight() / size.GetWidth();
         const int tick = bitmap.GetWidth() / size.GetWidth();
-        for (int h=bitmap.GetHeight(); h > new_height; --h) {
+        const int dh = bitmap.GetHeight() - new_height;
+        for (int h=0; h < dh; ++h) {
             image.RemoveHorizontalSeam();
             if (h % tick == 0) {
                 bitmap = image.GetBitmap();
+                progress = ProgressBar(size, h/float(dh));
                 Refresh();
                 Update();
                 wxYield();
