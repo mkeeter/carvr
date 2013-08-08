@@ -1,3 +1,5 @@
+#include <wx/aboutdlg.h>
+
 #include "frame.h"
 #include "panel.h"
 
@@ -10,12 +12,13 @@ CarvrFrame::CarvrFrame(const wxString& title)
     wxMenu* const file_menu = new wxMenu;
     file_menu->Append(wxID_EXIT, _("Quit\tCTRL-Q"));
     file_menu->Append(wxID_OPEN, _("Open\tCTRL-O"));
+    file_menu->Append(wxID_ABOUT, _("About"));
     menu_bar->Append(file_menu, _("File"));
     SetMenuBar(menu_bar);
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
-
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnAbout, this, wxID_ABOUT);
     Fit();
 }
 
@@ -38,4 +41,13 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
     open_dialog->Destroy();
 }
 
+void CarvrFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
+{
+    wxAboutDialogInfo info;
+    info.SetName(_("carvr"));
+    info.SetVersion(_("0.1"));
+    info.SetDescription(_("Seam carving made simple"));
+    info.SetCopyright(_("(C) Matthew Keeter, 2013"));
 
+    wxAboutBox(info);
+}
