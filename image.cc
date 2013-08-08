@@ -7,6 +7,7 @@ Image::Image(std::string filename)
     : filename(filename), img(cv::imread(filename))
 {
     cv::cvtColor(img, bw, CV_BGR2GRAY);
+    energy16 = cv::Mat(img.rows, img.cols, CV_16U);
     RecalculateEnergy();
 }
 
@@ -35,10 +36,13 @@ wxBitmap Image::GetBitmap() const
 
 void Image::RecalculateEnergy()
 {
-    cv::Sobel(bw, sobel_h, CV_16S, 1, 0);
-    cv::Sobel(bw, sobel_v, CV_16S, 0, 1);
+    cv::Sobel(bw, sobel_h, CV_16U, 1, 0);
+    cv::Sobel(bw, sobel_v, CV_16U, 0, 1);
 
-    energy16 = cv::abs(sobel_h) + cv::abs(sobel_v);
+    energy16.setTo(0);
+    energy16 += sobel_h;
+    energy16 += sobel_v;
+
     energy16.convertTo(energy32, CV_32S);
 }
 
