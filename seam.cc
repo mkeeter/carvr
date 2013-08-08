@@ -61,7 +61,7 @@ void RemoveSeam(cv::Mat& in, const Seam& seam)
     for (int r=0; r < in.rows; ++r) {
         uchar* const ptr = in.ptr(r);
         const int i = *(index++);
-        memcpy(ptr + i*size, ptr + (i+1)*size, (in.cols - (i+1))*size);
+        memmove(ptr + i*size, ptr + (i+1)*size, (in.cols - (i+1))*size);
     }
 }
 
