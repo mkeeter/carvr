@@ -20,18 +20,19 @@ private:
     void RemoveSeam();
     void TransposeMatrices();
 
+    // Name of the original image
     std::string filename;
 
     // At the end of every function, these matrices should be
     // of the correct size and storing correct data.
     cv::Mat img, bw;
-    cv::Mat sobel_h, sobel_v;
     cv::Mat energy16, energy32;
 
     // These matrices should always be of the correct size,
     // but only hold valid data when it is being used to find a seam.
-    cv::Mat summed;
+    cv::Mat tmp16, tmp32;
 
+    // Keep track of whether we're storing the original or a transposed image
     bool transposed;
 };
 

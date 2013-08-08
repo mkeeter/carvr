@@ -8,7 +8,8 @@ Image::Image(std::string filename)
 {
     cv::cvtColor(img, bw, CV_BGR2GRAY);
     energy16   = cv::Mat(img.rows, img.cols, CV_16U);
-    summed     = cv::Mat(img.rows, img.cols, CV_32S);
+    tmp16      = cv::Mat(img.rows, img.cols, CV_16U);
+    tmp32      = cv::Mat(img.rows, img.cols, CV_32S);
     RecalculateEnergy();
 }
 
@@ -16,9 +17,9 @@ Image::Image(std::string filename)
 
 void Image::TransposeMatrices()
 {
-    cv::Mat* matrices[] = {&img, &bw, &sobel_h, &sobel_v,
-                           &energy16, &energy32, &summed};
-    for (int i=0; i < 7; ++i) {
+    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32,
+                           &energy16, &energy32};
+    for (int i=0; i < 6; ++i) {
         cv::transpose(*matrices[i], *matrices[i]);
     }
 
@@ -64,12 +65,12 @@ wxBitmap Image::GetBitmap() const
 
 void Image::RecalculateEnergy()
 {
-    cv::Sobel(bw, sobel_h, CV_16U, 1, 0);
-    cv::Sobel(bw, sobel_v, CV_16U, 0, 1);
-
     energy16.setTo(0);
-    energy16 += sobel_h;
-    energy16 += sobel_v;
+
+    cv::Sobel(bw, tmp16, CV_16U, 1, 0);
+    energy16 += tmp16;
+    cv::Sobel(bw, tmp16, CV_16U, 0, 1);
+    energy16 += tmp16;
 
     energy16.convertTo(energy32, CV_32S);
 }
@@ -78,12 +79,11 @@ void Image::RecalculateEnergy()
 
 void Image::ChangeImageSizes(const cv::Range r, const cv::Range c)
 {
-    img      = img(r, c);
-    bw       = bw(r, c);
-    sobel_h  = sobel_h(r, c);
-    sobel_v  = sobel_v(r, c);
-    energy16 = energy16(r, c);
-    energy32 = energy32(r, c);
+    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32,
+                           &energy16, &energy32};
+    for (int i=0; i < 6; ++i) {
+        *matrices[i] = (*matrices[i])(r, c);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,8 +106,8 @@ void Image::RemoveVerticalSeam()
 
 void Image::RemoveSeam()
 {
-    GetEnergy(energy32, summed);
-    Seam seam = GetSeam(summed);
+    GetEnergy(energy32, tmp32);
+    Seam seam = GetSeam(tmp32);
 
     ::RemoveSeam(img, seam);
     ::RemoveSeam(bw,  seam);
