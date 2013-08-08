@@ -16,7 +16,6 @@ public:
     wxBitmap GetBitmap() const;
 private:
     void RecalculateEnergy();
-    void ChangeImageSizes(const cv::Range r, const cv::Range c);
     void RemoveSeam();
     void TransposeMatrices();
 

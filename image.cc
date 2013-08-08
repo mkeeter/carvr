@@ -32,7 +32,7 @@ wxBitmap Image::GetBitmap() const
 {
     if (img.empty())    return wxBitmap();
 
-    // Generate the bitmap if it doesn't exist or is of an incorrect size
+    // Allocate an array of image data (it will be freed by wx)
     uint8_t* const img_data = (uint8_t*)malloc(img.rows*img.cols*3);
 
     int a=0;
@@ -77,17 +77,6 @@ void Image::RecalculateEnergy()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Image::ChangeImageSizes(const cv::Range r, const cv::Range c)
-{
-    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32,
-                           &energy16, &energy32};
-    for (int i=0; i < 6; ++i) {
-        *matrices[i] = (*matrices[i])(r, c);
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 void Image::RemoveHorizontalSeam()
 {
     if (!transposed)    TransposeMatrices();
@@ -112,7 +101,11 @@ void Image::RemoveSeam()
     ::RemoveSeam(img, seam);
     ::RemoveSeam(bw,  seam);
 
-    ChangeImageSizes(cv::Range::all(), cv::Range(0, img.cols-1));
+    // Shrink all of the matrices by modifying their headers
+    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32,
+                           &energy16, &energy32};
+    for (int i=0; i < 6; ++i)   matrices[i]->cols--;
+
     RecalculateEnergy();
 }
 
