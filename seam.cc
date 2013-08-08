@@ -53,17 +53,15 @@ cv::Mat DrawVerticalSeam(const cv::Mat& in, const Seam& seam)
 
 void RemoveVerticalSeam(cv::Mat& in, const Seam& seam)
 {
-    Seam::const_iterator index = seam.begin();
+    const int type = in.type();
+    assert(type == CV_8UC3 || type == CV_8UC1);
+    const int size = (type == CV_8UC3) ? 3 : 1;
 
+    Seam::const_iterator index = seam.begin();
     for (int r=0; r < in.rows; ++r) {
-        for (int c=*(index++); c < in.cols-1; ++c) {
-            if (in.type() == CV_8UC3)
-                in.at<cv::Vec3b>(r, c) = in.at<cv::Vec3b>(r, c+1);
-            else if (in.type() == CV_8UC1)
-                in.at<uint8_t>(r, c) = in.at<uint8_t>(r, c+1);
-            else
-                assert(false);
-        }
+        uchar* const ptr = in.ptr(r);
+        const int i = *(index++);
+        memcpy(ptr + i*size, ptr + (i+1)*size, (in.cols - (i+1))*size);
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
