@@ -17,11 +17,8 @@ Image::Image(std::string filename)
 
 void Image::TransposeMatrices()
 {
-    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32,
-                           &energy16, &energy32};
-    for (int i=0; i < 6; ++i) {
-        cv::transpose(*matrices[i], *matrices[i]);
-    }
+    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};
+    for (int i=0; i < 6; ++i)   cv::transpose(*matrices[i], *matrices[i]);
 
     transposed = !transposed;
 }
@@ -56,9 +53,8 @@ wxBitmap Image::GetBitmap() const
         }
     }
 
-    wxImage wx_image(transposed ? img.rows : img.cols,
-                     transposed ? img.cols : img.rows, img_data);
-    return wxBitmap(wx_image);
+    return wxBitmap(wxImage(transposed ? img.rows : img.cols,
+                            transposed ? img.cols : img.rows, img_data));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +98,7 @@ void Image::RemoveSeam()
     ::RemoveSeam(bw,  seam);
 
     // Shrink all of the matrices by modifying their headers
-    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32,
-                           &energy16, &energy32};
+    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};
     for (int i=0; i < 6; ++i)   matrices[i]->cols--;
 
     RecalculateEnergy();
