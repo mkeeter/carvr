@@ -81,6 +81,8 @@ void ImagePanel::LoadImage(std::string filename)
     max_size = GetSize();
 
     GetParent()->Fit();
+    ((wxTopLevelWindow*)GetParent())->SetTitle(
+        _("carvr  (" + filename + ")"));
     Refresh();
 }
 

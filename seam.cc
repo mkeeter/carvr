@@ -53,9 +53,7 @@ cv::Mat DrawSeam(const cv::Mat& in, const Seam& seam)
 
 void RemoveSeam(cv::Mat& in, const Seam& seam)
 {
-    const int type = in.type();
-    assert(type == CV_8UC3 || type == CV_8UC1);
-    const int size = (type == CV_8UC3) ? 3 : 1;
+    const int size = in.elemSize();
 
     Seam::const_iterator index = seam.begin();
     for (int r=0; r < in.rows; ++r) {
