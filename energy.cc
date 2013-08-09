@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Calculates cumulative energy going down the image.
-void GetEnergy(const cv::Mat& energy, cv::Mat& summed)
+void GetCumulativeEnergy(const cv::Mat& energy, cv::Mat& summed)
 {
     energy.copyTo(summed);
 

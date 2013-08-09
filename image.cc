@@ -95,7 +95,7 @@ void Image::RemoveVerticalSeam()
 
 void Image::RemoveSeam()
 {
-    GetEnergy(energy32, tmp32);
+    GetCumulativeEnergy(energy32, tmp32);
     Seam seam = GetSeam(tmp32);
 
     ::RemoveSeam(img, seam);
