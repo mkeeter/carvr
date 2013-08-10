@@ -1,3 +1,5 @@
+#include <string>
+
 #include "image.h"
 
 #include "energy.h"
@@ -83,6 +85,51 @@ void Image::RecalculateEnergy()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Image::RecalculateEnergyBlock(cv::Range rows, cv::Range cols)
+{
+    cv::Rect large_roi(
+        std::max(cols.start - 4, 0), std::max(rows.start - 4, 0),
+        std::min(cols.end + 4, img.cols) - std::max(cols.start - 4, 0),
+        std::min(rows.end + 4, img.rows) - std::max(rows.start - 4, 0));
+
+    cv::Rect medium_roi(
+        std::max(cols.start - 2, 0), std::max(rows.start - 2, 0),
+        std::min(cols.end + 2, img.cols) - std::max(cols.start - 2, 0),
+        std::min(rows.end + 2, img.rows) - std::max(rows.start - 2, 0));
+
+    energy16(medium_roi).setTo(0);
+    cv::Sobel(bw(large_roi), tmp16(large_roi), CV_16U, 1, 0);
+    energy16(medium_roi) += tmp16(medium_roi);
+    cv::Sobel(bw(large_roi), tmp16(large_roi), CV_16U, 0, 1);
+    energy16(medium_roi) += tmp16(medium_roi);
+
+    energy16(medium_roi).convertTo(energy32(medium_roi), CV_32S);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Image::RecalculateSeamEnergy(const Seam& seam)
+{
+    cv::Range rows(0, 0);
+    cv::Range cols(img.cols, 0);
+
+    Seam::const_iterator itr = seam.begin();
+    for (int r=0; r < img.rows; ++r, ++itr)
+    {
+        if (r && (r % 40) == 0)
+        {
+            rows.end = r;
+            RecalculateEnergyBlock(rows, cols);
+            rows.start = r;
+            cols = cv::Range(img.cols, 0);
+        }
+        if (*itr < cols.start)  cols.start = *itr;
+        if (*itr > cols.end)    cols.end   = *itr;
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void Image::RemoveHorizontalSeam()
 {
     if (!transposed)    TransposeMatrices();
@@ -106,9 +153,9 @@ void Image::RemoveSeam()
 
     ::RemoveSeam(img, seam);
     ::RemoveSeam(bw,  seam);
+    ::RemoveSeam(energy16, seam);
 
     ResizeMatrices();
-    RecalculateEnergy();
+    RecalculateSeamEnergy(seam);
 }
-
 

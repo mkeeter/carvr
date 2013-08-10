@@ -6,6 +6,8 @@
 #include <opencv2/opencv.hpp>
 #include <wx/wx.h>
 
+#include "seam.h"
+
 class Image
 {
 public:
@@ -16,6 +18,8 @@ public:
     wxBitmap GetBitmap() const;
 private:
     void RecalculateEnergy();
+    void RecalculateEnergyBlock(cv::Range rows, cv::Range cols);
+    void RecalculateSeamEnergy(const Seam& seam);
     void RemoveSeam();
     void TransposeMatrices();
     void ResizeMatrices();

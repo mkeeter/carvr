@@ -40,10 +40,10 @@ cv::Mat DrawSeam(const cv::Mat& in, const Seam& seam)
 {
     cv::Mat out;
     in.copyTo(out);
-    Seam::const_iterator index = seam.begin();
+    Seam::const_iterator itr = seam.begin();
 
-    for (int j=0; j < in.rows; ++j, ++index) {
-        out.at<cv::Vec3b>(j, *index) = cv::Vec3b(255, 0, 0);
+    for (int j=0; j < in.rows; ++j, ++itr) {
+        out.at<cv::Vec3b>(j, *itr) = cv::Vec3b(255, 0, 0);
     }
 
     return out;
