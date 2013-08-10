@@ -25,6 +25,16 @@ void Image::TransposeMatrices()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Image::ResizeMatrices()
+{
+    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};
+    for (int i=0; i < 6; ++i) {
+        *matrices[i] = matrices[i]->colRange(0, matrices[i]->cols-1);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 wxBitmap Image::GetBitmap() const
 {
     if (img.empty())    return wxBitmap();
@@ -97,10 +107,7 @@ void Image::RemoveSeam()
     ::RemoveSeam(img, seam);
     ::RemoveSeam(bw,  seam);
 
-    // Shrink all of the matrices by modifying their headers
-    cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};
-    for (int i=0; i < 6; ++i)   matrices[i]->cols--;
-
+    ResizeMatrices();
     RecalculateEnergy();
 }
 

@@ -18,6 +18,7 @@ private:
     void RecalculateEnergy();
     void RemoveSeam();
     void TransposeMatrices();
+    void ResizeMatrices();
 
     // Name of the original image
     std::string filename;
