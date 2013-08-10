@@ -20,7 +20,9 @@ Image::Image(std::string filename)
 void Image::TransposeMatrices()
 {
     cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};
-    for (int i=0; i < 6; ++i)   cv::transpose(*matrices[i], *matrices[i]);
+    for (int i=0; i < 6; ++i) {
+        cv::transpose(*matrices[i], *matrices[i]);
+    }
 
     transposed = !transposed;
 }
