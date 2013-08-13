@@ -13,6 +13,7 @@ class Image
 public:
     Image() {};
     Image(std::string filename);
+    void Save(std::string filename) const;
     void RemoveHorizontalSeam();
     void RemoveVerticalSeam();
     wxBitmap GetBitmap() const;

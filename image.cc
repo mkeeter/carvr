@@ -17,6 +17,17 @@ Image::Image(std::string filename)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void Image::Save(std::string filename) const
+{
+    if (transposed) {
+        cv::imwrite(filename, img.t());
+    } else {
+        cv::imwrite(filename, img);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void Image::TransposeMatrices()
 {
     cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};

@@ -13,6 +13,7 @@ public:
     ImagePanel(wxFrame* parent);
     void OnPaint(wxPaintEvent& event);
     void LoadImage(std::string filename);
+    void SaveImage(std::string filename) const;
 private:
     const static wxSize min_size;
 

@@ -88,6 +88,13 @@ void ImagePanel::LoadImage(std::string filename)
 
 //////////////////////////////////////////////////////////////////////////////
 
+void ImagePanel::SaveImage(std::string filename) const
+{
+    image.Save(filename);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 {
     mouse_position = event.GetPosition();

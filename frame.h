@@ -12,6 +12,7 @@ public:
     CarvrFrame(const wxString& title);
     void OnQuit(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);
+    void OnSave(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 private:
     ImagePanel* const panel;
