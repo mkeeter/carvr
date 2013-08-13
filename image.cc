@@ -40,7 +40,7 @@ void Image::TransposeMatrices()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void Image::ResizeMatrices()
+void Image::RemoveOneColumn()
 {
     cv::Mat* matrices[] = {&img, &bw, &tmp16, &tmp32, &energy16, &energy32};
     for (int i=0; i < 6; ++i) {
@@ -168,7 +168,7 @@ void Image::RemoveSeam()
     ::RemoveSeam(bw,  seam);
     ::RemoveSeam(energy16, seam);
 
-    ResizeMatrices();
+    RemoveOneColumn();
     RecalculateSeamEnergy(seam);
 }
 

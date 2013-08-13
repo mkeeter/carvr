@@ -23,7 +23,7 @@ private:
     void RecalculateSeamEnergy(const Seam& seam);
     void RemoveSeam();
     void TransposeMatrices();
-    void ResizeMatrices();
+    void RemoveOneColumn();
 
     // Name of the original image
     std::string filename;
