@@ -78,7 +78,7 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 void ImagePanel::OnReloadBitmap(wxThreadEvent& event)
 {
     // Load an updated bitmap
-    bitmap = worker->image->GetBitmap();
+    bitmap = image->GetBitmap();
 
     // Tell the worker thread that it can keep going
     worker->semaphore.Post();
@@ -95,8 +95,6 @@ void ImagePanel::OnReloadBitmap(wxThreadEvent& event)
 void ImagePanel::OnWorkerDone(wxThreadEvent& WXUNUSED(event))
 {
     // Shuffle around image pointers to reclaim the image
-    image = worker->image;
-    worker->image = NULL;
     bitmap = image->GetBitmap();
 
     // Join the worker thread, then delete it.
@@ -196,11 +194,6 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 
     // Load up an empty progress bar
     progress = ProgressBar(size, 0);
-
-    // Release our claim on the image (so that we don't free it while the
-    // worker is still running, if shut-down occurs in the middle of this
-    // operation).
-    image = NULL;
 
     // Start up the thread.
     worker->Create();   // Not necessary in wx 2.9.5

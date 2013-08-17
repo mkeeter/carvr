@@ -14,7 +14,6 @@ class Worker : public wxThread
 public:
     Worker(Image* const image, const cv::Size target,
            const int tock, wxEvtHandler* const parent);
-    ~Worker();
 
     wxThread::ExitCode Entry();
     wxBitmap GetBitmap() const;
