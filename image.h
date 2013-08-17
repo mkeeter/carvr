@@ -13,10 +13,13 @@ class Image
 public:
     Image() {};
     Image(std::string filename);
+    int Width() const;
+    int Height() const;
     void Save(std::string filename) const;
     void RemoveHorizontalSeam();
     void RemoveVerticalSeam();
     wxBitmap GetBitmap() const;
+
 private:
     void RecalculateEnergy();
     void RecalculateEnergyBlock(cv::Range rows, cv::Range cols);
