@@ -16,13 +16,15 @@ public:
            const int tock, wxEvtHandler* const parent);
 
     wxThread::ExitCode Entry();
-    wxBitmap GetBitmap() const;
+    wxBitmap GetBitmap();
 
-    wxSemaphore semaphore;
-    Image* image;
 private:
+    Image* image;
+    wxBitmap bitmap;
     const cv::Size target;
     const int tock;
+
+    wxSemaphore semaphore;
     wxEvtHandler* const parent;
 };
 

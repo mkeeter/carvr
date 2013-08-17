@@ -78,10 +78,7 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 void ImagePanel::OnReloadBitmap(wxThreadEvent& event)
 {
     // Load an updated bitmap
-    bitmap = image->GetBitmap();
-
-    // Tell the worker thread that it can keep going
-    worker->semaphore.Post();
+    bitmap = worker->GetBitmap();
 
     // Update the progress bar (percent done is passed in the event)
     progress = ProgressBar(GetSize(), event.GetInt()/100.0f);
