@@ -1,6 +1,9 @@
 #include "panel.h"
 #include "bitmaps.h"
 
+#include "image.h"
+#include "worker.h"
+
 ////////////////////////////////////////////////////////////////////////////////
 
 const wxSize ImagePanel::min_size(40, 40);
@@ -9,7 +12,7 @@ const wxSize ImagePanel::min_size(40, 40);
 
 ImagePanel::ImagePanel(wxFrame* parent)
     : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxSize(640, 480)),
-      mode(BASE), max_size(GetSize()),
+      mode(BASE), image(NULL), worker(NULL), max_size(GetSize()),
       arrow_h(HorizontalArrow(max_size)),
       arrow_v(VerticalArrow(max_size))
 {
@@ -18,6 +21,24 @@ ImagePanel::ImagePanel(wxFrame* parent)
     Bind(wxEVT_LEFT_DOWN, &ImagePanel::OnMouseLDown, this);
     Bind(wxEVT_LEFT_UP, &ImagePanel::OnMouseLUp, this);
     Bind(wxEVT_SIZE, &ImagePanel::OnResize, this);
+
+    Bind(wxEVT_THREAD, &ImagePanel::OnReloadBitmap, this, RELOAD_BITMAP);
+    Bind(wxEVT_THREAD, &ImagePanel::OnWorkerDone, this, WORKER_DONE);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ImagePanel::~ImagePanel()
+{
+    // Shut down the worker thread
+    if (worker) {
+        worker->Delete();
+        worker->semaphore.Post();
+        wxMilliSleep(100); // small delay for the thread to finish up
+    }
+
+    // Delete the image
+    delete image;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +76,36 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void ImagePanel::OnReloadBitmap(wxThreadEvent& event)
+{
+    bitmap = worker->image->GetBitmap();
+    worker->semaphore.Post();
+    progress = ProgressBar(GetSize(), event.GetInt()/100.0f);
+    Refresh();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ImagePanel::OnWorkerDone(wxThreadEvent& WXUNUSED(event))
+{
+    // Shuffle around image pointers to reclaim the image
+    image = worker->image;
+    worker->image = NULL;
+    bitmap = image->GetBitmap();
+
+    // Start the shut-down sequence for the worker thread
+    worker->Delete();
+    worker->semaphore.Post();
+    worker = NULL;
+
+    // Update our local state
+    mode = BASE;
+    max_size = GetSize();
+    Refresh();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void ImagePanel::OnResize(wxSizeEvent& WXUNUSED(event))
 {
     const wxSize size = GetSize();
@@ -66,11 +117,12 @@ void ImagePanel::OnResize(wxSizeEvent& WXUNUSED(event))
 
 void ImagePanel::LoadImage(std::string filename)
 {
-    image = Image(filename);
-    bitmap = image.GetBitmap();
+    delete image;
+    image = new Image(filename);
+    bitmap = image->GetBitmap();
 
-    const int w = bitmap.GetWidth();
-    const int h = bitmap.GetHeight();
+    const int w = image->Width();
+    const int h = image->Height();
     if (w > h && w > 640) {
         SetSize(wxDefaultCoord, wxDefaultCoord, 640, 640*h/w);
     } else if (h > 640) {
@@ -90,7 +142,7 @@ void ImagePanel::LoadImage(std::string filename)
 
 void ImagePanel::SaveImage(std::string filename) const
 {
-    image.Save(filename);
+    image->Save(filename);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -113,46 +165,38 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 {
     if (mode == RESIZING)   return;
-    progress = ProgressBar(GetSize(), 0.5);
+
     const wxSize size = GetSize();
+    progress = ProgressBar(size, 0);
+
     if (mode == DRAG_HORIZONTAL) {
-        mode = RESIZING;
-        const int new_width = bitmap.GetHeight() *
+        const int new_width = image->Height() *
                               size.GetWidth() / size.GetHeight();
-        const int tick = bitmap.GetHeight() / size.GetHeight();
-        int dw = bitmap.GetWidth() - new_width;
-        for (int w = 0; w < dw; ++w) {
-            image.RemoveVerticalSeam();
-            if (w % tick == 0) {
-                bitmap = image.GetBitmap();
-                progress = ProgressBar(size, w/float(dw));
-                Refresh();
-                Update();
-                wxYield();
-            }
-        }
+
+        if (new_width == image->Width())    return;
+        else                                mode = RESIZING;
+
+        worker = new Worker(image, cv::Size(new_width, image->Height()),
+                            image->Height() / size.GetHeight(), this);
     } else if (mode == DRAG_VERTICAL) {
-        mode = RESIZING;
-        const int new_height = bitmap.GetWidth() *
+        const int new_height = image->Width() *
                                size.GetHeight() / size.GetWidth();
-        const int tick = bitmap.GetWidth() / size.GetWidth();
-        const int dh = bitmap.GetHeight() - new_height;
-        for (int h=0; h < dh; ++h) {
-            image.RemoveHorizontalSeam();
-            if (h % tick == 0) {
-                bitmap = image.GetBitmap();
-                progress = ProgressBar(size, h/float(dh));
-                Refresh();
-                Update();
-                wxYield();
-            }
-        }
+
+        if (new_height == image->Height())  return;
+        else                                mode = RESIZING;
+
+        worker = new Worker(image, cv::Size(image->Width(), new_height),
+                            image->Width() / size.GetWidth(), this);
     }
 
-    bitmap = image.GetBitmap();
-    mode = BASE;
-    max_size = size;
-    Refresh();
+    // Release our claim on the image (so that we don't free it while the
+    // worker is still running, if shut-down occurs in the middle of this
+    // operation).
+    image = NULL;
+
+    // Start up the thread.
+    worker->Create();   // Not necessary in wx 2.9.5
+    worker->Run();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

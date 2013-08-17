@@ -8,7 +8,7 @@ find_package(wxWidgets REQUIRED core base)
 include(${wxWidgets_USE_FILE})
 
 set(CMAKE_CXX_FLAGS "-Wall -O3 -g")
-add_executable (carvr MACOSX_BUNDLE main.cc seam.cc energy.cc app.cc frame.cc panel.cc overlay.cc bitmaps.cc image.cc)
+add_executable (carvr MACOSX_BUNDLE main.cc seam.cc energy.cc app.cc frame.cc panel.cc overlay.cc bitmaps.cc image.cc worker.cc)
 target_link_libraries(carvr ${OpenCV_LIBS} ${wxWidgets_LIBRARIES})
 
 #add_executable (test test.cc seam.cc energy.cc app.cc frame.cc panel.cc overlay.cc bitmaps.cc image.cc)
