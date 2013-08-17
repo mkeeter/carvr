@@ -20,7 +20,8 @@ and join thread
 
 Worker::Worker(Image* image, cv::Size target,
                const int tock, wxEvtHandler* const parent)
-    : semaphore(0, 1), image(image), target(target), tock(tock), parent(parent)
+    : wxThread(wxTHREAD_JOINABLE), semaphore(0, 1), image(image),
+      target(target), tock(tock), parent(parent)
 {
     // Nothing to do here
 }
@@ -52,16 +53,16 @@ wxThread::ExitCode Worker::Entry()
                                                      RELOAD_BITMAP);
             event->SetInt(tick*100/ticks);
             wxQueueEvent(parent, event);
-            semaphore.Wait();
+
+            // Stall in an infinite loop until either
+            //  a) The thread is stopped
+            //  b) We get a semaphore tick
+            while (!TestDestroy() && semaphore.TryWait() == wxSEMA_BUSY);
         }
     }
 
-    // If we halted because because Destroy was called, return immediately.
-    if (TestDestroy())  return (wxThread::ExitCode)0;
-
     // Tell the parent window that we're done.
     wxQueueEvent(parent, new wxThreadEvent(wxEVT_THREAD, WORKER_DONE));
-    semaphore.Wait();
 
     return (wxThread::ExitCode)0;
 }

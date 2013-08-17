@@ -33,8 +33,7 @@ ImagePanel::~ImagePanel()
     // Shut down the worker thread
     if (worker) {
         worker->Delete();
-        worker->semaphore.Post();
-        wxMilliSleep(100); // small delay for the thread to finish up
+        delete worker;
     }
 
     // Delete the image
@@ -78,9 +77,16 @@ void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 void ImagePanel::OnReloadBitmap(wxThreadEvent& event)
 {
+    // Load an updated bitmap
     bitmap = worker->image->GetBitmap();
+
+    // Tell the worker thread that it can keep going
     worker->semaphore.Post();
+
+    // Update the progress bar (percent done is passed in the event)
     progress = ProgressBar(GetSize(), event.GetInt()/100.0f);
+
+    // Force a redraw
     Refresh();
 }
 
@@ -93,9 +99,9 @@ void ImagePanel::OnWorkerDone(wxThreadEvent& WXUNUSED(event))
     worker->image = NULL;
     bitmap = image->GetBitmap();
 
-    // Start the shut-down sequence for the worker thread
+    // Join the worker thread, then delete it.
     worker->Delete();
-    worker->semaphore.Post();
+    delete worker;
     worker = NULL;
 
     // Update our local state
@@ -164,30 +170,32 @@ void ImagePanel::OnMouseLDown(wxMouseEvent& event)
 
 void ImagePanel::OnMouseLUp(wxMouseEvent& event)
 {
-    if (mode == RESIZING)   return;
-
     const wxSize size = GetSize();
-    progress = ProgressBar(size, 0);
+    const int w = size.GetWidth();
+    const int h = size.GetHeight();
 
     if (mode == DRAG_HORIZONTAL) {
-        const int new_width = image->Height() *
-                              size.GetWidth() / size.GetHeight();
+        const int new_width = image->Height() * w / h;
 
         if (new_width == image->Width())    return;
         else                                mode = RESIZING;
 
         worker = new Worker(image, cv::Size(new_width, image->Height()),
-                            image->Height() / size.GetHeight(), this);
+                            image->Height() / h, this);
     } else if (mode == DRAG_VERTICAL) {
-        const int new_height = image->Width() *
-                               size.GetHeight() / size.GetWidth();
+        const int new_height = image->Width() * h / w;
 
         if (new_height == image->Height())  return;
         else                                mode = RESIZING;
 
         worker = new Worker(image, cv::Size(image->Width(), new_height),
-                            image->Width() / size.GetWidth(), this);
+                            image->Width() / w, this);
+    } else {
+        return;
     }
+
+    // Load up an empty progress bar
+    progress = ProgressBar(size, 0);
 
     // Release our claim on the image (so that we don't free it while the
     // worker is still running, if shut-down occurs in the middle of this
