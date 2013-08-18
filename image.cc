@@ -9,8 +9,8 @@ Image::Image(std::string filename)
     : filename(filename), img(cv::imread(filename)), transposed(false)
 {
     cv::cvtColor(img, bw, CV_BGR2GRAY);
-    energy16   = cv::Mat(img.rows, img.cols, CV_16U);
-    tmp16      = cv::Mat(img.rows, img.cols, CV_16U);
+    energy16   = cv::Mat(img.rows, img.cols, CV_16S);
+    tmp16      = cv::Mat(img.rows, img.cols, CV_16S);
     tmp32      = cv::Mat(img.rows, img.cols, CV_32S);
     RecalculateEnergy();
 }
@@ -102,9 +102,12 @@ void Image::RecalculateEnergy()
 {
     energy16.setTo(0);
 
-    cv::Sobel(bw, tmp16, CV_16U, 1, 0);
+    cv::Sobel(bw, tmp16, CV_16S, 1, 0);
+    cv::absdiff(tmp16, cv::Scalar::all(0), tmp16);
     energy16 += tmp16;
-    cv::Sobel(bw, tmp16, CV_16U, 0, 1);
+
+    cv::Sobel(bw, tmp16, CV_16S, 0, 1);
+    cv::absdiff(tmp16, cv::Scalar::all(0), tmp16);
     energy16 += tmp16;
 
     energy16.convertTo(energy32, CV_32S);
@@ -115,19 +118,23 @@ void Image::RecalculateEnergy()
 void Image::RecalculateEnergyBlock(cv::Range rows, cv::Range cols)
 {
     cv::Rect large_roi(
+        std::max(cols.start - 6, 0), std::max(rows.start - 6, 0),
+        std::min(cols.end + 6, img.cols) - std::max(cols.start - 6, 0),
+        std::min(rows.end + 6, img.rows) - std::max(rows.start - 6, 0));
+
+    cv::Rect medium_roi(
         std::max(cols.start - 4, 0), std::max(rows.start - 4, 0),
         std::min(cols.end + 4, img.cols) - std::max(cols.start - 4, 0),
         std::min(rows.end + 4, img.rows) - std::max(rows.start - 4, 0));
 
-    cv::Rect medium_roi(
-        std::max(cols.start - 2, 0), std::max(rows.start - 2, 0),
-        std::min(cols.end + 2, img.cols) - std::max(cols.start - 2, 0),
-        std::min(rows.end + 2, img.rows) - std::max(rows.start - 2, 0));
-
     energy16(medium_roi).setTo(0);
-    cv::Sobel(bw(large_roi), tmp16(large_roi), CV_16U, 1, 0);
+
+    cv::Sobel(bw(large_roi), tmp16(large_roi), CV_16S, 1, 0);
+    cv::absdiff(tmp16(large_roi), cv::Scalar::all(0), tmp16(large_roi));
     energy16(medium_roi) += tmp16(medium_roi);
-    cv::Sobel(bw(large_roi), tmp16(large_roi), CV_16U, 0, 1);
+
+    cv::Sobel(bw(large_roi), tmp16(large_roi), CV_16S, 0, 1);
+    cv::absdiff(tmp16(large_roi), cv::Scalar::all(0), tmp16(large_roi));
     energy16(medium_roi) += tmp16(medium_roi);
 
     energy16(medium_roi).convertTo(energy32(medium_roi), CV_32S);
