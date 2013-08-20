@@ -144,21 +144,22 @@ void Image::RecalculateEnergyBlock(cv::Range rows, cv::Range cols)
 
 void Image::RecalculateSeamEnergy(const Seam& seam)
 {
-    cv::Range rows(0, 0);
-    cv::Range cols(img.cols, 0);
-
     Seam::const_iterator itr = seam.begin();
+    cv::Range rows(0, 0);
+    cv::Range cols = cv::Range(img.cols, 0);
+
     for (int r=0; r < img.rows; ++r, ++itr)
     {
-        if (r && (r % 40) == 0)
+        cols.start = std::min(cols.start, *itr);
+        cols.end   = std::max(cols.end,   *itr);
+
+        if (r != 0 && (r % 40 == 0 || r == img.rows - 1))
         {
-            rows.end = r;
+            rows.end = r + 1;
             RecalculateEnergyBlock(rows, cols);
-            rows.start = r;
+            rows.start = rows.end;
             cols = cv::Range(img.cols, 0);
         }
-        if (*itr < cols.start)  cols.start = *itr;
-        if (*itr > cols.end)    cols.end   = *itr;
     }
 }
 
