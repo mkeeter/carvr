@@ -23,6 +23,7 @@ public:
 private:
     void RecalculateEnergy();
     void RecalculateEnergyBlock(cv::Range rows, cv::Range cols);
+    void RecalculateBackColumnEnergy();
     void RecalculateSeamEnergy(const Seam& seam);
     void RemoveSeam();
     void TransposeMatrices();

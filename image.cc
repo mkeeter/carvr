@@ -118,14 +118,14 @@ void Image::RecalculateEnergy()
 void Image::RecalculateEnergyBlock(cv::Range rows, cv::Range cols)
 {
     cv::Rect large_roi(
-        std::max(cols.start - 6, 0), std::max(rows.start - 6, 0),
-        std::min(cols.end + 6, img.cols) - std::max(cols.start - 6, 0),
-        std::min(rows.end + 6, img.rows) - std::max(rows.start - 6, 0));
-
-    cv::Rect medium_roi(
         std::max(cols.start - 4, 0), std::max(rows.start - 4, 0),
         std::min(cols.end + 4, img.cols) - std::max(cols.start - 4, 0),
         std::min(rows.end + 4, img.rows) - std::max(rows.start - 4, 0));
+
+    cv::Rect medium_roi(
+        std::max(cols.start - 2, 0), std::max(rows.start - 2, 0),
+        std::min(cols.end + 2, img.cols) - std::max(cols.start - 2, 0),
+        std::min(rows.end + 2, img.rows) - std::max(rows.start - 2, 0));
 
     energy16(medium_roi).setTo(0);
 
@@ -138,6 +138,26 @@ void Image::RecalculateEnergyBlock(cv::Range rows, cv::Range cols)
     energy16(medium_roi) += tmp16(medium_roi);
 
     energy16(medium_roi).convertTo(energy32(medium_roi), CV_32S);
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void Image::RecalculateBackColumnEnergy()
+{
+    cv::Range cr1(std::max(0, img.cols - 4), img.cols);
+    cv::Range cr2(std::max(0, img.cols - 2), img.cols);
+    energy16.colRange(cr2).setTo(0);
+
+    cv::Sobel(bw.colRange(cr1), tmp16.colRange(cr1), CV_16S, 1, 0);
+    cv::absdiff(tmp16.colRange(cr1), cv::Scalar::all(0), tmp16.colRange(cr1));
+    energy16.colRange(cr2) += tmp16.colRange(cr2);
+
+    cv::Sobel(bw.colRange(cr1), tmp16.colRange(cr1), CV_16S, 0, 1);
+    cv::absdiff(tmp16.colRange(cr1), cv::Scalar::all(0), tmp16.colRange(cr1));
+    energy16.colRange(cr2) += tmp16.colRange(cr2);
+
+    energy16.colRange(cr2).convertTo(energy32.colRange(cr2), CV_32S);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +171,7 @@ void Image::RecalculateSeamEnergy(const Seam& seam)
     for (int r=0; r < img.rows; ++r, ++itr)
     {
         cols.start = std::min(cols.start, *itr);
-        cols.end   = std::max(cols.end,   *itr);
+        cols.end   = std::max(cols.end,   *itr + 1);
 
         if (r != 0 && (r % 40 == 0 || r == img.rows - 1))
         {
@@ -161,6 +181,7 @@ void Image::RecalculateSeamEnergy(const Seam& seam)
             cols = cv::Range(img.cols, 0);
         }
     }
+    RecalculateBackColumnEnergy();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
