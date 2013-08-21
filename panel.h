@@ -17,6 +17,7 @@ public:
 
     void LoadImage(std::string filename);
     void SaveImage(std::string filename) const;
+    Image& GetImage();
 
 private:
     const static wxSize min_size;
