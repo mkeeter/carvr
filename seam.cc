@@ -43,7 +43,11 @@ cv::Mat DrawSeam(const cv::Mat& in, const Seam& seam)
     Seam::const_iterator itr = seam.begin();
 
     for (int j=0; j < in.rows; ++j, ++itr) {
-        out.at<cv::Vec3b>(j, *itr) = cv::Vec3b(255, 0, 0);
+        if (in.type() == CV_8UC3) {
+            out.at<cv::Vec3b>(j, *itr) = cv::Vec3b(255, 0, 0);
+        } else if (in.type() == CV_8U) {
+            out.at<uint8_t>(j, *itr) = 128;
+        }
     }
 
     return out;
@@ -55,10 +59,10 @@ void RemoveSeam(cv::Mat& in, const Seam& seam)
 {
     const int size = in.elemSize();
 
-    Seam::const_iterator index = seam.begin();
-    for (int r=0; r < in.rows; ++r) {
+    Seam::const_iterator itr = seam.begin();
+    for (int r=0; r < in.rows; ++r, ++itr) {
         uchar* const ptr = in.ptr(r);
-        const int i = *(index++);
+        const int i = *itr;
         memmove(ptr + i*size, ptr + (i+1)*size, (in.cols - (i+1))*size);
     }
 }
