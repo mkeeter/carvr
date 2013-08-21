@@ -15,12 +15,19 @@ CarvrFrame::CarvrFrame(const wxString& title)
     file_menu->Append(wxID_ABOUT, _("About"));
     file_menu->Append(wxID_SAVE, _("Save\tCTRL-S"));
     menu_bar->Append(file_menu, _("File"));
+
+    wxMenu* const edit_menu = new wxMenu;
+    edit_menu->Append(wxID_UNDO, _("Undo\tCTRL-Z"))->Enable(false);
+    menu_bar->Append(edit_menu, _("Edit"));
+
     SetMenuBar(menu_bar);
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnSave, this, wxID_SAVE);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnAbout, this, wxID_ABOUT);
+
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnUndo, this, wxID_UNDO);
     Fit();
 }
 
@@ -39,6 +46,7 @@ void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
     if (open_dialog->ShowModal() == wxID_OK) {
         const std::string filename = open_dialog->GetPath().ToStdString();
         panel->LoadImage(filename);
+        GetMenuBar()->Enable(wxID_UNDO, false);
     }
 
     open_dialog->Destroy();
@@ -81,4 +89,9 @@ void CarvrFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
     info.SetCopyright(_("(C) Matthew Keeter, 2013"));
 
     wxAboutBox(info);
+}
+
+void CarvrFrame::OnUndo(wxCommandEvent& WXUNUSED(event))
+{
+    panel->Undo();
 }

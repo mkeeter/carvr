@@ -91,7 +91,7 @@ void ImagePanel::OnReloadBitmap(wxThreadEvent& event)
 
 void ImagePanel::OnWorkerDone(wxThreadEvent& WXUNUSED(event))
 {
-    // Shuffle around image pointers to reclaim the image
+    // Get an updated bitmap
     bitmap = image->GetBitmap();
 
     // Join the worker thread, then delete it.
@@ -103,6 +103,9 @@ void ImagePanel::OnWorkerDone(wxThreadEvent& WXUNUSED(event))
     mode = BASE;
     max_size = GetSize();
     Refresh();
+
+    // Update the frame, now that there's something to undo
+    ((wxFrame*)GetParent())->GetMenuBar()->Enable(wxID_UNDO, true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,9 +151,32 @@ void ImagePanel::SaveImage(std::string filename) const
 
 //////////////////////////////////////////////////////////////////////////////
 
-Image& ImagePanel::GetImage()
+void ImagePanel::Undo()
 {
-    return *image;
+    Image* const new_image = undo_stack.top();
+    undo_stack.pop();
+
+    const wxSize size = GetSize();
+    int w = size.GetWidth();
+    int h = size.GetHeight();
+    if (new_image->Width() > image->Width()) {
+        w = w * new_image->Width() / image->Width();
+    }
+    if (new_image->Height() > image->Height()) {
+        h = h * new_image->Height() / image->Height();
+    }
+    SetSize(wxDefaultCoord, wxDefaultCoord, w, h);
+    max_size = GetSize();
+    GetParent()->Fit();
+
+    delete image;
+    image = new_image;
+
+    if (undo_stack.size() == 0) {
+        ((wxFrame*)GetParent())->GetMenuBar()->Enable(wxID_UNDO, false);
+    }
+
+    Refresh();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -195,6 +221,12 @@ void ImagePanel::OnMouseLUp(wxMouseEvent& event)
     } else {
         return;
     }
+
+    // Save the unmodified image on the undo stack
+    undo_stack.push(image->Clone());
+
+    // Disable undo operations until we're done with the resizing
+    ((wxFrame*)GetParent())->GetMenuBar()->Enable(wxID_UNDO, false);
 
     // Load up an empty progress bar
     progress = ProgressBar(size, 0);

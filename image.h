@@ -13,11 +13,13 @@ class Image
 public:
     Image() {};
     Image(std::string filename);
+
     int Width() const;
     int Height() const;
     void Save(std::string filename) const;
     void RemoveHorizontalSeam();
     void RemoveVerticalSeam();
+    Image* Clone() const;
     wxBitmap GetBitmap() const;
 
 private:

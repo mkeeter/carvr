@@ -215,3 +215,22 @@ void Image::RemoveSeam()
     RecalculateSeamEnergy(seam);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+Image* Image::Clone() const
+{
+    Image* c = new Image();
+
+    // Copy over all of the things, making clones of the cv::Mat objects
+    c->filename = filename;
+    c->img      = img.clone();
+    c->bw       = bw.clone();
+    c->energy16 = energy16.clone();
+    c->energy32 = energy32.clone();
+    c->tmp16    = tmp16.clone();
+    c->tmp32    = tmp32.clone();
+    c->transposed = transposed;
+
+    return c;
+}
+
