@@ -4,7 +4,7 @@ project(carvr)
 find_package(OpenCV REQUIRED)
 include(${OpenCV_INCLUDE_DIRS})
 
-find_package(wxWidgets REQUIRED core base)
+find_package(wxWidgets 2.9.0 REQUIRED core base adv)
 include(${wxWidgets_USE_FILE})
 
 set(CMAKE_CXX_FLAGS "-Wall -O3 -g")
