@@ -8,13 +8,41 @@ bool CarvrApp::OnInit()
     }
     SetAppDisplayName(GetAppName());
 
-    frame = new CarvrFrame();
-    frame->Show(true);
+    frames.push_back(new CarvrFrame());
+    frames.back()->Show();
 
     return true;
 }
 
 void CarvrApp::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
-    frame->Close();
+    std::list<CarvrFrame*>::iterator itr;
+    for (itr = frames.begin(); itr != frames.end(); ++itr) {
+        (**itr).Close();
+    }
+}
+
+void CarvrApp::OnOpen(wxCommandEvent& WXUNUSED(event))
+{
+    wxFileDialog* open_dialog = new wxFileDialog(
+            frames.back(), "Choose a file", "", "",
+            "*.png|*.jpg|*.jpeg|*.bmp",
+            wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_CHANGE_DIR);
+
+    if (open_dialog->ShowModal() == wxID_OK) {
+        const std::string filename = open_dialog->GetPath().ToStdString();
+        if (frames.back()->ImageLoaded())
+        {
+            frames.push_back(new CarvrFrame());
+        }
+        frames.back()->LoadImage(filename);
+        frames.back()->Show();
+    }
+
+    open_dialog->Destroy();
+}
+
+void CarvrApp::RemoveFrame(CarvrFrame* frame)
+{
+    frames.remove(frame);
 }

@@ -42,6 +42,13 @@ ImagePanel::~ImagePanel()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool ImagePanel::ImageLoaded() const
+{
+    return image != NULL;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 void ImagePanel::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     wxGraphicsContext* gc = wxGraphicsContext::Create(this);

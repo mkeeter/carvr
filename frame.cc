@@ -26,7 +26,7 @@ CarvrFrame::CarvrFrame()
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnQuit, (CarvrApp*)wxTheApp, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnClose, this, wxID_CLOSE);
-    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnOpen, (CarvrApp*)wxTheApp, wxID_OPEN);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnSave, this, wxID_SAVE);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnAbout, this, wxID_ABOUT);
 
@@ -34,25 +34,25 @@ CarvrFrame::CarvrFrame()
     Fit();
 }
 
+// Upon destruction, remove this frame from the master list
+CarvrFrame::~CarvrFrame()
+{
+    ((CarvrApp*)wxTheApp)->RemoveFrame(this);
+}
+
+void CarvrFrame::LoadImage(std::string filename)
+{
+    panel->LoadImage(filename);
+}
+
+bool CarvrFrame::ImageLoaded() const
+{
+    return panel->ImageLoaded();
+}
+
 void CarvrFrame::OnClose(wxCommandEvent& WXUNUSED(event))
 {
     Close();
-}
-
-void CarvrFrame::OnOpen(wxCommandEvent& WXUNUSED(event))
-{
-    wxFileDialog* open_dialog = new wxFileDialog(
-            this, "Choose a file", "", "",
-            "*.png|*.jpg|*.jpeg|*.bmp",
-            wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_CHANGE_DIR);
-
-    if (open_dialog->ShowModal() == wxID_OK) {
-        const std::string filename = open_dialog->GetPath().ToStdString();
-        panel->LoadImage(filename);
-        GetMenuBar()->Enable(wxID_UNDO, false);
-    }
-
-    open_dialog->Destroy();
 }
 
 void CarvrFrame::OnSave(wxCommandEvent& WXUNUSED(event))
