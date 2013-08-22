@@ -16,7 +16,7 @@ public:
     ImagePanel(wxFrame* parent);
     virtual ~ImagePanel();
 
-    bool ImageLoaded() const;
+    const Image* GetImage() const;
     void LoadImage(std::string filename);
     void SaveImage(std::string filename) const;
     void Undo();

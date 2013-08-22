@@ -16,9 +16,14 @@ public:
 
     int Width() const;
     int Height() const;
+    std::string Filename() const;
+    std::string Extension() const;
+
     void Save(std::string filename) const;
+
     void RemoveHorizontalSeam();
     void RemoveVerticalSeam();
+
     Image* Clone() const;
     wxBitmap GetBitmap() const;
 

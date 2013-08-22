@@ -6,14 +6,15 @@
 
 // Forward declaration of ImagePanel
 class ImagePanel;
+class Image;
 
 class CarvrFrame : public wxFrame
 {
 public:
     CarvrFrame(std::string filename="");
     ~CarvrFrame();
+    const Image* GetImage() const;
     void LoadImage(std::string filename);
-    bool ImageLoaded() const;
 private:
     void OnClose(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);

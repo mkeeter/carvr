@@ -40,7 +40,7 @@ void CarvrApp::OnOpen(wxCommandEvent& WXUNUSED(event))
 
         for (size_t f=0; f < filenames.GetCount(); ++f) {
             const std::string filename = filenames[f].ToStdString();
-            if (frames.back()->ImageLoaded()) {
+            if (frames.back()->GetImage() != NULL) {
                 frames.push_back(new CarvrFrame(filename));
             } else {
                 frames.back()->LoadImage(filename);
