@@ -13,11 +13,11 @@ CarvrFrame::CarvrFrame()
 {
     wxMenuBar* const menu_bar = new wxMenuBar;
     wxMenu* const file_menu = new wxMenu;
-    file_menu->Append(wxID_EXIT, _("Quit\tCTRL-Q"));
-    file_menu->Append(wxID_CLOSE, _("Close\tCTRL-W"));
     file_menu->Append(wxID_OPEN, _("Open\tCTRL-O"));
-    file_menu->Append(wxID_ABOUT, _("About"));
     file_menu->Append(wxID_SAVE, _("Save\tCTRL-S"));
+    file_menu->Append(wxID_CLOSE, _("Close\tCTRL-W"));
+    file_menu->Append(wxID_EXIT, _("Quit\tCTRL-Q"));
+    file_menu->Append(wxID_ABOUT, _("About"));
     menu_bar->Append(file_menu, _("File"));
 
     wxMenu* const edit_menu = new wxMenu;
@@ -26,10 +26,10 @@ CarvrFrame::CarvrFrame()
 
     SetMenuBar(menu_bar);
 
-    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnQuit, (CarvrApp*)wxTheApp, wxID_EXIT);
-    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnClose, this, wxID_CLOSE);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnOpen, (CarvrApp*)wxTheApp, wxID_OPEN);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnSave, this, wxID_SAVE);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnClose, this, wxID_CLOSE);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnQuit, (CarvrApp*)wxTheApp, wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnAbout, this, wxID_ABOUT);
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnUndo, this, wxID_UNDO);
