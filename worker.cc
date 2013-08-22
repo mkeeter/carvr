@@ -1,22 +1,6 @@
-/*Post BITMAP_READY to main thread
-waits on semaphore
-
-main thread listens for BITMAP_READY
-loads bitmap
-post semaphore
-
-
-
-Post WORKER_DONE to main thread
-waits on semaphore
-and halts
-
-main thread listens for WORKER_DONE and reclaims image
-then post semaphore
-and join thread
-*/
-
 #include "worker.h"
+
+////////////////////////////////////////////////////////////////////////////////
 
 Worker::Worker(Image* image, cv::Size target,
                const int tock, wxEvtHandler* const parent)

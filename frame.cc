@@ -4,6 +4,8 @@
 #include "frame.h"
 #include "panel.h"
 
+////////////////////////////////////////////////////////////////////////////////
+
 CarvrFrame::CarvrFrame()
     : wxFrame(NULL, wxID_ANY, "carvr", wxDefaultPosition, wxDefaultSize,
               wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)),
@@ -34,26 +36,36 @@ CarvrFrame::CarvrFrame()
     Fit();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 // Upon destruction, remove this frame from the master list
 CarvrFrame::~CarvrFrame()
 {
     ((CarvrApp*)wxTheApp)->RemoveFrame(this);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void CarvrFrame::LoadImage(std::string filename)
 {
     panel->LoadImage(filename);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 bool CarvrFrame::ImageLoaded() const
 {
     return panel->ImageLoaded();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void CarvrFrame::OnClose(wxCommandEvent& WXUNUSED(event))
 {
     Close();
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void CarvrFrame::OnSave(wxCommandEvent& WXUNUSED(event))
 {
@@ -83,6 +95,8 @@ void CarvrFrame::OnSave(wxCommandEvent& WXUNUSED(event))
     save_dialog->Destroy();
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void CarvrFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     wxAboutDialogInfo info;
@@ -93,6 +107,8 @@ void CarvrFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 
     wxAboutBox(info);
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void CarvrFrame::OnUndo(wxCommandEvent& WXUNUSED(event))
 {

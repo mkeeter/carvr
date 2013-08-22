@@ -5,6 +5,8 @@
 #include "energy.h"
 #include "seam.h"
 
+////////////////////////////////////////////////////////////////////////////////
+
 Image::Image(std::string filename)
     : filename(filename), img(cv::imread(filename)), transposed(false)
 {

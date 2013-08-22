@@ -1,6 +1,8 @@
 #include "app.h"
 #include "frame.h"
 
+////////////////////////////////////////////////////////////////////////////////
+
 bool CarvrApp::OnInit()
 {
     if (!wxApp::OnInit()) {
@@ -14,6 +16,8 @@ bool CarvrApp::OnInit()
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 void CarvrApp::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
     std::list<CarvrFrame*>::iterator itr;
@@ -21,6 +25,8 @@ void CarvrApp::OnQuit(wxCommandEvent& WXUNUSED(event))
         (**itr).Close();
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void CarvrApp::OnOpen(wxCommandEvent& WXUNUSED(event))
 {
@@ -41,6 +47,8 @@ void CarvrApp::OnOpen(wxCommandEvent& WXUNUSED(event))
 
     open_dialog->Destroy();
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 void CarvrApp::RemoveFrame(CarvrFrame* frame)
 {
