@@ -9,9 +9,9 @@ class ImagePanel;
 class CarvrFrame : public wxFrame
 {
 public:
-    CarvrFrame(const wxString& title);
+    CarvrFrame();
 private:
-    void OnQuit(wxCommandEvent& event);
+    void OnClose(wxCommandEvent& event);
     void OnOpen(wxCommandEvent& event);
     void OnSave(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);

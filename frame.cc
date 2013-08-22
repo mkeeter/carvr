@@ -1,16 +1,18 @@
 #include <wx/aboutdlg.h>
 
+#include "app.h"
 #include "frame.h"
 #include "panel.h"
 
-CarvrFrame::CarvrFrame(const wxString& title)
-    : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxDefaultSize,
+CarvrFrame::CarvrFrame()
+    : wxFrame(NULL, wxID_ANY, "carvr", wxDefaultPosition, wxDefaultSize,
               wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)),
       panel(new ImagePanel(this))
 {
     wxMenuBar* const menu_bar = new wxMenuBar;
     wxMenu* const file_menu = new wxMenu;
     file_menu->Append(wxID_EXIT, _("Quit\tCTRL-Q"));
+    file_menu->Append(wxID_CLOSE, _("Close\tCTRL-W"));
     file_menu->Append(wxID_OPEN, _("Open\tCTRL-O"));
     file_menu->Append(wxID_ABOUT, _("About"));
     file_menu->Append(wxID_SAVE, _("Save\tCTRL-S"));
@@ -22,7 +24,8 @@ CarvrFrame::CarvrFrame(const wxString& title)
 
     SetMenuBar(menu_bar);
 
-    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnQuit, this, wxID_EXIT);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnQuit, (CarvrApp*)wxTheApp, wxID_EXIT);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnClose, this, wxID_CLOSE);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnOpen, this, wxID_OPEN);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnSave, this, wxID_SAVE);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnAbout, this, wxID_ABOUT);
@@ -31,7 +34,7 @@ CarvrFrame::CarvrFrame(const wxString& title)
     Fit();
 }
 
-void CarvrFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+void CarvrFrame::OnClose(wxCommandEvent& WXUNUSED(event))
 {
     Close();
 }

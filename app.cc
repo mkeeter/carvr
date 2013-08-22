@@ -8,8 +8,13 @@ bool CarvrApp::OnInit()
     }
     SetAppDisplayName(GetAppName());
 
-    CarvrFrame* frame = new CarvrFrame("carvr");
+    frame = new CarvrFrame();
     frame->Show(true);
 
     return true;
+}
+
+void CarvrApp::OnQuit(wxCommandEvent& WXUNUSED(event))
+{
+    frame->Close();
 }
