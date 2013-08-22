@@ -32,14 +32,19 @@ void CarvrApp::OnOpen(wxCommandEvent& WXUNUSED(event))
     wxFileDialog* open_dialog = new wxFileDialog(
             frames.back(), "Choose a file", "", "",
             "*.png|*.jpg|*.jpeg|*.bmp",
-            wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_CHANGE_DIR);
+            wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_CHANGE_DIR | wxFD_MULTIPLE);
 
     if (open_dialog->ShowModal() == wxID_OK) {
-        const std::string filename = open_dialog->GetPath().ToStdString();
-        if (frames.back()->ImageLoaded()) {
-            frames.push_back(new CarvrFrame(filename));
-        } else {
-            frames.back()->LoadImage(filename);
+        wxArrayString filenames;
+        open_dialog->GetPaths(filenames);
+
+        for (size_t f=0; f < filenames.GetCount(); ++f) {
+            const std::string filename = filenames[f].ToStdString();
+            if (frames.back()->ImageLoaded()) {
+                frames.push_back(new CarvrFrame(filename));
+            } else {
+                frames.back()->LoadImage(filename);
+            }
         }
     }
 
