@@ -178,6 +178,7 @@ void ImagePanel::Undo()
 
     delete image;
     image = new_image;
+    bitmap = image->GetBitmap();
 
     if (undo_stack.size() == 0) {
         ((wxFrame*)GetParent())->GetMenuBar()->Enable(wxID_UNDO, false);
