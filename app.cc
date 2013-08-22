@@ -11,7 +11,6 @@ bool CarvrApp::OnInit()
     SetAppDisplayName(GetAppName());
 
     frames.push_back(new CarvrFrame());
-    frames.back()->Show();
 
     return true;
 }
@@ -37,12 +36,11 @@ void CarvrApp::OnOpen(wxCommandEvent& WXUNUSED(event))
 
     if (open_dialog->ShowModal() == wxID_OK) {
         const std::string filename = open_dialog->GetPath().ToStdString();
-        if (frames.back()->ImageLoaded())
-        {
-            frames.push_back(new CarvrFrame());
+        if (frames.back()->ImageLoaded()) {
+            frames.push_back(new CarvrFrame(filename));
+        } else {
+            frames.back()->LoadImage(filename);
         }
-        frames.back()->LoadImage(filename);
-        frames.back()->Show();
     }
 
     open_dialog->Destroy();

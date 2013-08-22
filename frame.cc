@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CarvrFrame::CarvrFrame()
+CarvrFrame::CarvrFrame(std::string filename)
     : wxFrame(NULL, wxID_ANY, "carvr", wxDefaultPosition, wxDefaultSize,
               wxDEFAULT_FRAME_STYLE & ~(wxRESIZE_BORDER | wxMAXIMIZE_BOX)),
       panel(new ImagePanel(this))
@@ -34,6 +34,11 @@ CarvrFrame::CarvrFrame()
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnUndo, this, wxID_UNDO);
     Fit();
+
+    if (!filename.empty()) {
+        LoadImage(filename);
+    }
+    Show();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

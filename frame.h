@@ -10,7 +10,7 @@ class ImagePanel;
 class CarvrFrame : public wxFrame
 {
 public:
-    CarvrFrame();
+    CarvrFrame(std::string filename="");
     ~CarvrFrame();
     void LoadImage(std::string filename);
     bool ImageLoaded() const;
