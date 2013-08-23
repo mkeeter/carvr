@@ -180,7 +180,7 @@ void ImagePanel::Undo()
     image = new_image;
     bitmap = image->GetBitmap();
 
-    if (undo_stack.size() == 0) {
+    if (undo_stack.empty()) {
         ((wxFrame*)GetParent())->GetMenuBar()->Enable(wxID_UNDO, false);
     }
 

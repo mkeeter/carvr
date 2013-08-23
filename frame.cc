@@ -27,10 +27,12 @@ CarvrFrame::CarvrFrame(std::string filename)
 
     SetMenuBar(menu_bar);
 
-    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnOpen, (CarvrApp*)wxTheApp, wxID_OPEN);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnOpen,
+         static_cast<CarvrApp*>(wxTheApp), wxID_OPEN);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnSave, this, wxID_SAVE);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnClose, this, wxID_CLOSE);
-    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnQuit, (CarvrApp*)wxTheApp, wxID_EXIT);
+    Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrApp::OnQuit,
+         static_cast<CarvrApp*>(wxTheApp), wxID_EXIT);
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnAbout, this, wxID_ABOUT);
 
     Bind(wxEVT_COMMAND_MENU_SELECTED, &CarvrFrame::OnUndo, this, wxID_UNDO);
@@ -47,7 +49,7 @@ CarvrFrame::CarvrFrame(std::string filename)
 // Upon destruction, remove this frame from the master list
 CarvrFrame::~CarvrFrame()
 {
-    ((CarvrApp*)wxTheApp)->RemoveFrame(this);
+    static_cast<CarvrApp*>(wxTheApp)->RemoveFrame(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
