@@ -8,3 +8,6 @@ all:
 
 clean:
 	rm -rf build carvr.app carvr
+
+check:
+	cppcheck --enable=all -q *.cc *.h
