@@ -76,29 +76,15 @@ void CarvrFrame::OnClose(wxCommandEvent& WXUNUSED(event))
 void CarvrFrame::OnSave(wxCommandEvent& WXUNUSED(event))
 {
     wxFileDialog* save_dialog = new wxFileDialog(
-            this, "Save image as", "", "", "*",
-            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+            this, "Save image as", "", "",
+            _("\
+PNG image (*.png)|*.png|\
+JPG image (*.jpg)|*.jpg|\
+Bitmap image (*.bmp)|*.bmp"),
+            wxFD_SAVE);
 
     if (save_dialog->ShowModal() == wxID_OK) {
-        std::string filename = save_dialog->GetPath().ToStdString();
-        if (filename.find('.') == std::string::npos) {
-            filename += panel->GetImage()->Extension();
-        }
-        try {
-            panel->SaveImage(filename);
-        } catch (cv::Exception& e) {
-            wxMessageDialog* d;
-            if (strstr(e.what(), "specified extension")) {
-                d = new wxMessageDialog(
-                        this, "Acceptable values are .jpg, .png, .bmp",
-                        "Error: Invalid extension");
-            } else {
-                d = new wxMessageDialog(
-                        this, e.what(), "OpenCV error:");
-            }
-            d->ShowModal();
-            d->Destroy();
-        }
+        panel->SaveImage(save_dialog->GetPath().ToStdString());
     }
 
     save_dialog->Destroy();
