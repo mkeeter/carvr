@@ -2,6 +2,7 @@
 
 #include "app.h"
 #include "frame.h"
+#include "image.h"
 #include "panel.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +80,10 @@ void CarvrFrame::OnSave(wxCommandEvent& WXUNUSED(event))
             wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
     if (save_dialog->ShowModal() == wxID_OK) {
-        const std::string filename = save_dialog->GetPath().ToStdString();
+        std::string filename = save_dialog->GetPath().ToStdString();
+        if (filename.find('.') == std::string::npos) {
+            filename += panel->GetImage()->Extension();
+        }
         try {
             panel->SaveImage(filename);
         } catch (cv::Exception& e) {

@@ -43,7 +43,7 @@ std::string Image::Filename() const
 
 std::string Image::Extension() const
 {
-    return filename;
+    return filename.substr(filename.find_last_of('.'));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

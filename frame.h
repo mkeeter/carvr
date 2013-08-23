@@ -4,7 +4,7 @@
 #include <string>
 #include <wx/wx.h>
 
-// Forward declaration of ImagePanel
+// Forward declarations
 class ImagePanel;
 class Image;
 
