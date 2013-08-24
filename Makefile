@@ -3,7 +3,7 @@ all:
 	cd build && cmake .. && make
 	cp -r build/carvr.app .
 	rm -rf carvr
-	echo "#\!/bin/sh\n`pwd`/carvr.app/Contents/MacOS/carvr" > carvr
+	echo "#\!/bin/sh\n`pwd`/build/carvr.app/Contents/MacOS/carvr" > carvr
 	chmod a+x carvr
 
 clean:
