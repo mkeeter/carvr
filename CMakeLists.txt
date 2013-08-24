@@ -28,7 +28,17 @@ if (APPLE)
         TARGET carvr
         POST_BUILD
         COMMAND /usr/libexec/PListBuddy -c "Set :CFBundleIconFile carvr.icns" carvr.app/Contents/Info.plist
+        COMMENT "Updating Info.plist"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    add_custom_command(
+        TARGET carvr
+        POST_BUILD
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/dylib.sh carvr
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIRECTORY}
+        COMMENT "Copying linked libraries"
+        VERBATIM
     )
 endif(APPLE)
 
