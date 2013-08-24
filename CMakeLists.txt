@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6) 
 project(carvr)
 
-find_package(OpenCV REQUIRED)
+find_package(OpenCV REQUIRED core imgproc highgui)
 include(${OpenCV_INCLUDE_DIRS})
 
 find_package(wxWidgets 2.9.0 REQUIRED core base adv)
