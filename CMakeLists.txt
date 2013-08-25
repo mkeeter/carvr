@@ -28,7 +28,7 @@ target_link_libraries(carvr ${OpenCV_LIBS} ${wxWidgets_LIBRARIES})
 if (APPLE)
     add_custom_command(
         TARGET carvr POST_BUILD
-        COMMAND /usr/libexec/PListBuddy -c "Set :CFBundleIconFile carvr.icns" carvr.app/Contents/Info.plist
+        COMMAND /usr/libexec/PListBuddy -c "Set :CFBundleIconFile carvr.icns" -c "Set :CFBundleName carvr" carvr.app/Contents/Info.plist
         COMMENT "Updating Info.plist"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
