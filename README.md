@@ -15,4 +15,4 @@ You can install all of the dependancies through [Homebrew](http://brew.sh/):
 Type `make` in the root directory (there's a top-level Makefile that delegates all of the hard work to CMake).
 
 # Download
-Alternatively, download a prebuild .app.
+Alternatively, you can download a [prebuild .app](http://mattkeeter.com/projects/carvr/carvr.zip).
