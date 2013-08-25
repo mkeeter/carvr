@@ -11,3 +11,7 @@ clean:
 
 check:
 	cppcheck --enable=all -q *.cc *.h
+
+upload:
+	zip -r carvr.zip carvr.app
+	scp carvr.zip mkeeter@mattkeeter.com:~/mattkeeter.com/projects/carvr
