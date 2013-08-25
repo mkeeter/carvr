@@ -8,6 +8,8 @@ find_package(wxWidgets 2.9.0 REQUIRED core base adv)
 include(${wxWidgets_USE_FILE})
 
 set(CMAKE_CXX_FLAGS "-Wall -O3 -g")
+set(CMAKE_CXX_LINKER_FLAGS "-headerpad_max_install_names")
+
 set(SRCS MACOSX_BUNDLE main.cc seam.cc energy.cc app.cc frame.cc panel.cc overlay.cc bitmaps.cc image.cc worker.cc)
 
 if(APPLE)
