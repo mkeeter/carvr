@@ -1,7 +1,7 @@
 # carvr
 carvr implements image resizing through [seam carving](http://www.youtube.com/watch?v=6NcIJXTlugc).  It is optimized for speed and has a very minimal interface.
 
-![Demo](http://mk/projects/carvr/demo.gif)
+![Demo](http://mattkeeter.com/projects/carvr/demo.gif)
 
 # Dependancies
 You can install all of the dependancies through [Homebrew](http://brew.sh/):  
