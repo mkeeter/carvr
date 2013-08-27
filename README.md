@@ -16,3 +16,9 @@ Type `make` in the root directory (there's a top-level Makefile that delegates a
 
 # Download
 Alternatively, you can download a [prebuilt .app](http://mattkeeter.com/projects/carvr/carvr.zip).
+
+# License
+This work may be reproduced, modified, distributed, performed, and displayed for any purpose. Copyright is retained and must be preserved. The work is provided as is; no warranty is provided, and users accept all liability.
+
+# Copyright
+(c) 2013 Matt Keeter
